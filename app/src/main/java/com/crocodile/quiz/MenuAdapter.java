@@ -8,9 +8,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-/**
- * Created by vshir on 27.01.2018.
- */
 
 public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.ViewHolder> {
     private String[] mDataset;
@@ -26,7 +23,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.ViewHolder> {
 
         public ViewHolder(View v) {
             super(v);
-            mRelativeLayout = (RelativeLayout) v.findViewById(R.id.ralativelayout);
+            mRelativeLayout = (RelativeLayout) v.findViewById(R.id.relativelayout);
             mImageView = (ImageView) v.findViewById(R.id.imageview);
             mTextView = (TextView) v.findViewById(R.id.textview);
 

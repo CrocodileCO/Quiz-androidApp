@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private String[] getDataSet() {
 
-        String[] mDataSet = new String[100];
+        String[] mDataSet = new String[10];
         for (int i = 0; i < 10; i++) {
             mDataSet[i] = "item" + i;
         }
