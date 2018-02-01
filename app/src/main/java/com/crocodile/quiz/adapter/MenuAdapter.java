@@ -1,6 +1,7 @@
 package com.crocodile.quiz.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.crocodile.quiz.R;
+import com.crocodile.quiz.activity.QuestionActivity;
 import com.crocodile.quiz.model.Topic;
 
 import java.io.InputStream;
@@ -23,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static android.R.attr.bitmap;
+import static android.R.attr.content;
 import static android.app.PendingIntent.getActivity;
 
 
@@ -71,8 +74,9 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.ViewHolder> {
         holder.mRelativeLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO go to question activity
-                Toast.makeText(context,"Selected: "+ topic.getTitle(),Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(context, QuestionActivity.class);
+                intent.putExtra("name",topic.getTitle());
+                context.startActivity(intent);
             }
         });
 
