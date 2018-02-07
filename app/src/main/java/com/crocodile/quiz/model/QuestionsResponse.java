@@ -1,37 +1,21 @@
 package com.crocodile.quiz.model;
 
-import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 public class QuestionsResponse {
 
-@SerializedName("qustionsResponse")
-@Expose
-private List<Question> qustionsResponse = null;
+    @SerializedName("questions")
+    @Expose
+    private List<Question> questions = null;
 
-/**
-* No args constructor for use in serialization
-* 
-*/
-public QuestionsResponse() {
-}
+    public List<Question> getQuestions() {
+        return questions;
+    }
 
-/**
-* 
-* @param qustionsResponse
-*/
-public QuestionsResponse(List<Question> qustionsResponse) {
-super();
-this.qustionsResponse = qustionsResponse;
-}
-
-public List<Question> getQustionsResponse() {
-return qustionsResponse;
-}
-
-public void setQustionsResponse(List<Question> qustionsResponse) {
-this.qustionsResponse = qustionsResponse;
-}
-
+    public void setQuestions(List<Question> questions) {
+        this.questions = questions;
+    }
 }
