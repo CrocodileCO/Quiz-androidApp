@@ -10,17 +10,9 @@ public class TopicsResponse {
     @SerializedName("topics")
     private List<Topic> topics = null;
 
-    /**
-     * No args constructor for use in serialization
-     * 
-     */
     public TopicsResponse() {
     }
 
-    /**
-     * 
-     * @param topics
-     */
     public TopicsResponse(List<Topic> topics) {
         super();
         this.topics = topics;
