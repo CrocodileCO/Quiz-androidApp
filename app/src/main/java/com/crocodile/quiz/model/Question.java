@@ -1,27 +1,31 @@
 package com.crocodile.quiz.model;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 public class Question {
 
+    @SerializedName("id")
+    @Expose
     private Integer id;
+    @SerializedName("img_url")
+    @Expose
     private String imgUrl;
+    @SerializedName("answer1")
+    @Expose
     private String answer1;
+    @SerializedName("answer2")
+    @Expose
     private String answer2;
+    @SerializedName("answer3")
+    @Expose
     private String answer3;
+    @SerializedName("answer4")
+    @Expose
     private String answer4;
-
-    public  Question(){
-
-    }
-
-    public Question(Integer id, String imgUrl, String answer1, String answer2, String answer3, String answer4) {
-        super();
-        this.id = id;
-        this.imgUrl = imgUrl;
-        this.answer1 = answer1;
-        this.answer2 = answer2;
-        this.answer3 = answer3;
-        this.answer4 = answer4;
-    }
+    @SerializedName("topicId")
+    @Expose
+    private Integer topicId;
 
     public Integer getId() {
         return id;
@@ -69,6 +73,14 @@ public class Question {
 
     public void setAnswer4(String answer4) {
         this.answer4 = answer4;
+    }
+
+    public Integer getTopicId() {
+        return topicId;
+    }
+
+    public void setTopicId(Integer topicId) {
+        this.topicId = topicId;
     }
 
 }
