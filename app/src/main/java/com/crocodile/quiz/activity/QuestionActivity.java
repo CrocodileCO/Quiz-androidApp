@@ -8,8 +8,10 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import com.crocodile.quiz.R;
 import com.crocodile.quiz.model.Question;
@@ -39,6 +41,7 @@ public class QuestionActivity extends AppCompatActivity {
     Button button3;
     Button button4;
     ImageView imageView;
+    RelativeLayout container;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,6 +57,7 @@ public class QuestionActivity extends AppCompatActivity {
         button3 =  findViewById(R.id.button3);
         button4 =  findViewById(R.id.button4);
         imageView = findViewById(R.id.imageViewQuestion);
+        container = findViewById(R.id.containerQuestion);
 
         loadItems();
 
@@ -116,6 +120,7 @@ public class QuestionActivity extends AppCompatActivity {
 
         protected void onPostExecute(Bitmap result) {
             bmImage.setImageBitmap(result);
+            container.setVisibility(View.VISIBLE);
         }
     }
 

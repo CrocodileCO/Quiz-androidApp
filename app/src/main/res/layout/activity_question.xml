@@ -8,6 +8,8 @@
 
 
     <RelativeLayout
+        android:id="@+id/containerQuestion"
+        android:visibility="invisible"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         
@@ -26,11 +28,10 @@
                 >
 
                 <ImageView
-                    android:id="@+id/imageView"
+                    android:id="@+id/imageViewQuestion"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_centerHorizontal="true"
-                    android:src="@drawable/topic_background"/>
+                    android:layout_centerHorizontal="true"/>
             </RelativeLayout>
 
             <LinearLayout
@@ -51,14 +52,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:text="Button11111" />
+                        android:text="" />
 
                     <Button
                         android:id="@+id/button2"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:text="Button22222222" />
+                        android:text="" />
 
                 </LinearLayout>
                 <LinearLayout
@@ -71,14 +72,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:text="Button3333333" />
+                        android:text="" />
 
                     <Button
                         android:id="@+id/button4"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:text="Button444444" />
+                        android:text="" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
