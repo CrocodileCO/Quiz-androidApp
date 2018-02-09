@@ -29,9 +29,6 @@ import retrofit2.Response;
 
 import static com.crocodile.quiz.rest.ApiClient.BASE_URL;
 
-/**
- * Created by vshir on 01.02.2018.
- */
 
 public class QuestionActivity extends AppCompatActivity {
 
@@ -69,13 +66,13 @@ public class QuestionActivity extends AppCompatActivity {
         ApiClient.getClient().create(ServerInterface.class);
 
 
-        Call<QuestionsResponse> call = apiService.getQuestions();
+        Call<List<Question>> call = apiService.getQuestions();
 
-        call.enqueue(new Callback<QuestionsResponse>() {
+        call.enqueue(new Callback<List<Question>>() {
             @Override
-            public void onResponse(Call<QuestionsResponse> call, Response<QuestionsResponse> response) {
+            public void onResponse(Call<List<Question>> call, Response<List<Question>> response) {
                 int statusCode = response.code();
-                questions = response.body().getQuestions();
+                questions = response.body();
 
                 Question qu =questions.get(0);
                 button1.setText(qu.getAnswer1());
@@ -83,13 +80,13 @@ public class QuestionActivity extends AppCompatActivity {
                 button3.setText(qu.getAnswer3());
                 button4.setText(qu.getAnswer4());
                 //imageView.setImageURI(Uri.parse(qu.getImgUrl()));
-                new DownloadImageTask(imageView).execute(qu.getImgUrl());
+                new DownloadImageTask(imageView).execute(qu.getImageUrl());
 
 
             }
 
             @Override
-            public void onFailure(Call<QuestionsResponse> call, Throwable t) {
+            public void onFailure(Call<List<Question>> call, Throwable t) {
                 Log.e("lol", t.toString());
             }
         });

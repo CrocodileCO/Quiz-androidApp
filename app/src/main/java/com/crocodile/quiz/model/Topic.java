@@ -1,47 +1,38 @@
 
 package com.crocodile.quiz.model;
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class Topic {
 
-    @SerializedName("id")
-    private Integer id;
+    @SerializedName("_id")
+    private String _id;
     @SerializedName("title")
     private String title;
-    @SerializedName("backgroundURL")
-    private String backgroundURL;
+    @SerializedName("imageUrl")
+    private String imageUrl;
 
-    /**
-     * No args constructor for use in serialization
-     * 
-     */
     public Topic() {
     }
 
-    /**
-     * 
-     * @param id
-     * @param title
-     */
-    public Topic(Integer id, String title, String backgroundURL) {
+
+    public Topic(String _id, String title, String imageUrl) {
         super();
-        this.id = id;
+        this._id = _id;
         this.title = title;
-        this.backgroundURL = backgroundURL;
+        this.imageUrl = imageUrl;
     }
 
-    public Integer getId() {
-        return id;
+    public String get_id() {
+        return _id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void set_id(String _id) {
+        this._id = _id;
     }
 
-    public Topic withId(Integer id) {
-        this.id = id;
+    public Topic withId(String id) {
+        this._id = id;
         return this;
     }
 
@@ -58,9 +49,9 @@ public class Topic {
         return this;
     }
 
-    public String getBackgroundURL() { return backgroundURL;}
+    public String getImageUrl() { return imageUrl;}
 
-    public void setBackgroundURL(String backgroundURL) {
-        this.backgroundURL = backgroundURL;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

@@ -57,33 +57,25 @@ public class MainActivity extends AppCompatActivity {
         ApiClient.getClient().create(ServerInterface.class);
 
 
-        Call<TopicsResponse> call = apiService.getTopics();
+        Call<List<Topic>> call = apiService.getTopics();
 
-        call.enqueue(new Callback<TopicsResponse>() {
+        call.enqueue(new Callback<List<Topic>>() {
             @Override
-            public void onResponse(Call<TopicsResponse> call, Response<TopicsResponse> response) {
-                //код ответа сервера (200 - ОК), в данном случае далее не используется
+            public void onResponse(Call<List<Topic>> call, Response<List<Topic>> response) {
                 int statusCode = response.code();
-                //получаем список фильмов, произведя парсинг JSON ответа с помощью библиотеки Retrofit
-                List<Topic> topics = response.body().getTopics();
+
+                List<Topic> topics = response.body();
 
                 mRecyclerView.setAdapter(new MenuAdapter(topics, R.layout.menu_item, getApplicationContext()));
-                //Toast.makeText(getBaseContext(), topics.get(0).getTitle(), Toast.LENGTH_SHORT ).show();
+
             }
 
             @Override
-            public void onFailure(Call<TopicsResponse> call, Throwable t) {
-                //onFailure вызывается, когда проблема при отправке запроса. Например, сервер не отвечает или нет сети.
-                //Заносим сведения об ошибке в журнал методом Log.e(TAG, MESSAGE)
-                //Данный метод используется для журнализации ошибок (e = error)
+            public void onFailure(Call<List<Topic>> call, Throwable t) {
                 Log.e("lol", t.toString());
 
             }
         });
-
-        /*ArrayList<Topic> topics = new ArrayList<Topic>();
-        topics.add(new Topic(0, "Science", "https://i.imgur.com/EagZoEp.png"));
-        topics.add(new Topic(1, "Art", "https://i.imgur.com/EagZoEp.png"));*/
 
 
     }

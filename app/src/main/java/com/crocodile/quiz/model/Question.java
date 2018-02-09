@@ -5,12 +5,12 @@ import com.google.gson.annotations.SerializedName;
 
 public class Question {
 
-    @SerializedName("id")
+    @SerializedName("_id")
     @Expose
-    private Integer id;
-    @SerializedName("img_url")
+    private String _id;
+    @SerializedName("imageUrl")
     @Expose
-    private String imgUrl;
+    private String imageUrl;
     @SerializedName("answer1")
     @Expose
     private String answer1;
@@ -25,22 +25,22 @@ public class Question {
     private String answer4;
     @SerializedName("topicId")
     @Expose
-    private Integer topicId;
+    private String topicId;
 
-    public Integer getId() {
-        return id;
+    public String get_id() {
+        return _id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void set_id(String _id) {
+        this._id = _id;
     }
 
-    public String getImgUrl() {
-        return imgUrl;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setImgUrl(String imgUrl) {
-        this.imgUrl = imgUrl;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public String getAnswer1() {
@@ -75,11 +75,11 @@ public class Question {
         this.answer4 = answer4;
     }
 
-    public Integer getTopicId() {
+    public String getTopicId() {
         return topicId;
     }
 
-    public void setTopicId(Integer topicId) {
+    public void setTopicId(String topicId) {
         this.topicId = topicId;
     }
 
