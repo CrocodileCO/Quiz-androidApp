@@ -15,6 +15,7 @@ import android.widget.RelativeLayout;
 
 import com.crocodile.quiz.R;
 import com.crocodile.quiz.model.Question;
+import com.crocodile.quiz.model.TracerUserQuest;
 import com.crocodile.quiz.rest.ApiClient;
 import com.crocodile.quiz.rest.ServerInterface;
 import com.crocodile.quiz.rest.ServiceGenerator;
@@ -43,6 +44,7 @@ public class QuestionActivity extends AppCompatActivity {
     String[] currentMass;
     RelativeLayout container;
     Boolean getAnswer = false;
+    TracerUserQuest tracerUserQuest = new TracerUserQuest();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,7 +67,8 @@ public class QuestionActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (!getAnswer&&!(qu.getAnswer1().equals(currentMass[0]))) {
                     button1.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_false));
-                }
+                    tracerUserQuest.setAnswer(currentMass[0],false);
+                }else{tracerUserQuest.setAnswer(currentMass[0],true);}
 
                 rightButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_true));
                 getAnswer = true;
@@ -76,7 +79,8 @@ public class QuestionActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (!getAnswer&&!(qu.getAnswer1().equals(currentMass[1]))) {
                     button2.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_false));
-                }
+                    tracerUserQuest.setAnswer(currentMass[1],false);
+                }else{tracerUserQuest.setAnswer(currentMass[1],true);}
 
                 rightButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_true));
                 getAnswer = true;
@@ -86,9 +90,10 @@ public class QuestionActivity extends AppCompatActivity {
         button3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!getAnswer&&!(qu.getAnswer1().equals(currentMass[1]))) {
+                if (!getAnswer&&!(qu.getAnswer1().equals(currentMass[2]))) {
                     button3.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_false));
-                }
+                    tracerUserQuest.setAnswer(currentMass[2],false);
+                }else{tracerUserQuest.setAnswer(currentMass[2],true);}
 
                 rightButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_true));
                 getAnswer = true;
@@ -98,14 +103,18 @@ public class QuestionActivity extends AppCompatActivity {
         button4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!getAnswer&&!(qu.getAnswer1().equals(currentMass[1]))) {
+                if (!getAnswer&&!(qu.getAnswer1().equals(currentMass[3]))) {
                     button4.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_false));
-                }
+                    tracerUserQuest.setAnswer(currentMass[3],false);
+                }else{tracerUserQuest.setAnswer(currentMass[3],true);}
 
                 rightButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_true));
                 getAnswer = true;
             }
         });
+
+
+        container.setO
 
         loadItems();
 
@@ -140,6 +149,8 @@ public class QuestionActivity extends AppCompatActivity {
                 if (currentMass[3].equals(qu.getAnswer1())){rightButton=button4;}
                 //imageView.setImageURI(Uri.parse(qu.getImgUrl()));
                 new DownloadImageTask(imageView).execute(qu.getImageUrl());
+
+
 
 
             }
