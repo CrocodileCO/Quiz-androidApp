@@ -36,6 +36,7 @@ public class QuestionActivity extends AppCompatActivity {
     Question currentQuestion;
     int currentQuestionIndex;
     LoadingFragment loadingFragment;
+    QuestionFragment questionFragment;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -104,6 +105,7 @@ public class QuestionActivity extends AppCompatActivity {
 
     private void onQuestionsLoaded(List<Question> loadedQuestions) {
         this.questions = loadedQuestions;
+        questionFragment = new QuestionFragment();
         currentQuestionIndex = 0;
         loadQuestion(currentQuestionIndex);
     }
@@ -113,12 +115,11 @@ public class QuestionActivity extends AppCompatActivity {
 
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-        QuestionFragment fragment = new QuestionFragment();
+        
         Bundle bundle = new Bundle();
         bundle.putSerializable("question", currentQuestion);
-        fragment.setArguments(bundle);
-        fragmentTransaction.replace(R.id.fragment_container, fragment);
+        questionFragment.setArguments(bundle);
+        fragmentTransaction.replace(R.id.fragment_container, questionFragment);
         fragmentTransaction.commit();
     }
 

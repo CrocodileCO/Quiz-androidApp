@@ -31,7 +31,7 @@ public class QuestionFragment extends Fragment {
     ImageView imageView;
     List<String> answers;
     RelativeLayout container;
-    Boolean answered = false;
+    Boolean answered;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -56,6 +56,7 @@ public class QuestionFragment extends Fragment {
         imageView = getActivity().findViewById(R.id.imageViewQuestion);
         container = getActivity().findViewById(R.id.containerQuestion);
 
+        answered = false;
         question = (Question) getArguments().getSerializable("question");
 
         setupQuestion();
