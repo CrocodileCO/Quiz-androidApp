@@ -68,7 +68,7 @@ public class Question implements Serializable{
         }
     }
 
-    public boolean isPlayerAnsweredRight() { return playerAnsweredRight; }
+    public boolean isPlayersAnswerRight() { return playerAnsweredRight; }
 
     public Bitmap getImage() {
         return image;

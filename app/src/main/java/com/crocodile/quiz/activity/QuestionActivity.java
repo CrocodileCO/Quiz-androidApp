@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.crocodile.quiz.R;
 import com.crocodile.quiz.fragment.LoadingFragment;
@@ -31,7 +32,10 @@ import static com.crocodile.quiz.rest.ApiClient.BASE_URL;
 
 public class QuestionActivity extends AppCompatActivity {
 
+    List<Question> questions;
     Question currentQuestion;
+    int currentQuestionIndex;
+    LoadingFragment loadingFragment;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -42,18 +46,25 @@ public class QuestionActivity extends AppCompatActivity {
         String name = intent.getStringExtra("name");
         setTitle(name);
 
+        loadingFragment = new LoadingFragment();
+
         insertLoadingFragment();
 
         loadItems();
 
     }
 
+    public void showNextQuestion() {
+        insertLoadingFragment();
+        currentQuestionIndex++;
+        loadQuestion(currentQuestionIndex);
+    }
+
     private void insertLoadingFragment() {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-        LoadingFragment fragment = new LoadingFragment();
-        fragmentTransaction.add(R.id.fragment_container, fragment);
+        fragmentTransaction.replace(R.id.fragment_container, loadingFragment);
         fragmentTransaction.commit();
     }
 
@@ -80,11 +91,21 @@ public class QuestionActivity extends AppCompatActivity {
 
     }
 
-    private void onQuestionsLoaded(List<Question> questions) {
-        currentQuestion = questions.get(0);
-        currentQuestion.setup();
+    private void loadQuestion(int index) {
+        if (index < questions.size()) {
+            currentQuestion = questions.get(index);
+            currentQuestion.setup();
 
-        new DownloadImageTask(this).execute(currentQuestion.getImageUrl());
+            new DownloadImageTask(this).execute(currentQuestion.getImageUrl());
+        } else {
+            Toast.makeText(getApplicationContext(), "Quiz ended. Right answers: " + countRightAnswers() + "/" + questions.size() + ".", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void onQuestionsLoaded(List<Question> loadedQuestions) {
+        this.questions = loadedQuestions;
+        currentQuestionIndex = 0;
+        loadQuestion(currentQuestionIndex);
     }
 
     private void onImageDownloaded(Bitmap image) {
@@ -127,5 +148,12 @@ public class QuestionActivity extends AppCompatActivity {
         }
     }
 
+    private int countRightAnswers() {
+        int result = 0;
+        for (Question question: questions) {
+            result += question.isPlayersAnswerRight() ? 1 : 0;
+        }
+        return result;
+    }
 
 }

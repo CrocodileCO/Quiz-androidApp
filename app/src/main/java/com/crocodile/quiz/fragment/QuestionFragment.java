@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.crocodile.quiz.R;
+import com.crocodile.quiz.activity.QuestionActivity;
 import com.crocodile.quiz.model.Question;
 
 import java.util.ArrayList;
@@ -88,6 +89,19 @@ public class QuestionFragment extends Fragment {
             });
         }
 
+        container.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (answered) {
+                    showNextQuestion();
+                }
+            }
+        });
+
         container.setVisibility(View.VISIBLE);
+    }
+
+    private void showNextQuestion() {
+        ((QuestionActivity) getActivity()).showNextQuestion();
     }
 }
