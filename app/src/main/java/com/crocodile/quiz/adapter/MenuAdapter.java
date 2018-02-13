@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.crocodile.quiz.R;
 import com.crocodile.quiz.activity.QuestionActivity;
+import com.crocodile.quiz.helper.DownloadHelper;
 import com.crocodile.quiz.model.Topic;
 
 import java.io.InputStream;
@@ -30,7 +31,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.ViewHolder> {
     private int topicLayout;
     private Context context;
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder  implements DownloadHelper.OnImageDownloadListener{
 
         public RelativeLayout mRelativeLayout;
         public TextView mTextView;
@@ -42,6 +43,11 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.ViewHolder> {
             mImageView = (ImageView) v.findViewById(R.id.imageview);
             mTextView = (TextView) v.findViewById(R.id.textview);
 
+        }
+
+        @Override
+        public void onImageDownloaded(Bitmap image) {
+            mImageView.setImageBitmap(image);
         }
     }
 
@@ -74,37 +80,9 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.ViewHolder> {
             }
         });
 
-
-        new DownloadImageTask(holder.mImageView).execute(topic.getImageUrl());
+        DownloadHelper.downloadImage(topic.getImageUrl(),holder);
     }
 
-
-    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-        ImageView bmImage;
-
-
-        public DownloadImageTask(ImageView bmImage) {
-            this.bmImage = bmImage;
-        }
-
-        protected Bitmap doInBackground(String... urls) {
-            String urldisplay = urls[0];
-            Bitmap mIcon11 = null;
-            try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
-                mIcon11 = BitmapFactory.decodeStream(in);
-            } catch (Exception e) {
-                //Toast.makeText(context, "", Toast.LENGTH_SHORT).show();
-                //Log.e(TAG, e.getMessage());
-                e.printStackTrace();
-            }
-            return mIcon11;
-        }
-
-        protected void onPostExecute(Bitmap result) {
-            bmImage.setImageBitmap(result);
-        }
-    }
 
     @Override
     public int getItemCount() {

@@ -1,5 +1,6 @@
 package com.crocodile.quiz.activity;
 
+import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,6 +10,7 @@ import android.widget.Toast;
 
 import com.crocodile.quiz.R;
 import com.crocodile.quiz.adapter.MenuAdapter;
+import com.crocodile.quiz.helper.DownloadHelper;
 import com.crocodile.quiz.model.Topic;
 import com.crocodile.quiz.model.TopicsResponse;
 import com.crocodile.quiz.rest.ApiClient;
@@ -29,7 +31,7 @@ import retrofit2.Response;
 
 import static com.crocodile.quiz.rest.ApiClient.BASE_URL;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements DownloadHelper.OnImageDownloadListener{
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -87,5 +89,10 @@ public class MainActivity extends AppCompatActivity {
             mDataSet[i] = "item" + i;
         }
         return mDataSet;
+    }
+
+    @Override
+    public void onImageDownloaded(Bitmap image) {
+
     }
 }

@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.crocodile.quiz.R;
 import com.crocodile.quiz.fragment.LoadingFragment;
 import com.crocodile.quiz.fragment.QuestionFragment;
+import com.crocodile.quiz.helper.DownloadHelper;
 import com.crocodile.quiz.model.Question;
 import com.crocodile.quiz.rest.ApiClient;
 import com.crocodile.quiz.rest.ServerInterface;
@@ -30,7 +31,7 @@ import retrofit2.Response;
 import static com.crocodile.quiz.rest.ApiClient.BASE_URL;
 
 
-public class QuestionActivity extends AppCompatActivity {
+public class QuestionActivity extends AppCompatActivity implements DownloadHelper.OnImageDownloadListener{
 
     List<Question> questions;
     Question currentQuestion;
@@ -97,7 +98,7 @@ public class QuestionActivity extends AppCompatActivity {
             currentQuestion = questions.get(index);
             currentQuestion.setup();
 
-            new DownloadImageTask(this).execute(currentQuestion.getImageUrl());
+            DownloadHelper.downloadImage(currentQuestion.getImageUrl(), this);
         } else {
             Toast.makeText(getApplicationContext(), "Quiz ended. Right answers: " + countRightAnswers() + "/" + questions.size() + ".", Toast.LENGTH_LONG).show();
         }
@@ -110,43 +111,20 @@ public class QuestionActivity extends AppCompatActivity {
         loadQuestion(currentQuestionIndex);
     }
 
-    private void onImageDownloaded(Bitmap image) {
+    public void onImageDownloaded(Bitmap image) {
         currentQuestion.setImage(image);
+        insertQuestionFragment();
+    }
 
+    private void insertQuestionFragment() {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        
+
         Bundle bundle = new Bundle();
         bundle.putSerializable("question", currentQuestion);
         questionFragment.setArguments(bundle);
         fragmentTransaction.replace(R.id.fragment_container, questionFragment);
         fragmentTransaction.commit();
-    }
-
-
-    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-        QuestionActivity activity;
-
-
-        private DownloadImageTask(QuestionActivity activity) {
-            this.activity = activity;
-        }
-
-        protected Bitmap doInBackground(String... urls) {
-            String urldisplay = urls[0];
-            Bitmap mIcon11 = null;
-            try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
-                mIcon11 = BitmapFactory.decodeStream(in);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return mIcon11;
-        }
-
-        protected void onPostExecute(Bitmap result) {
-            activity.onImageDownloaded(result);
-        }
     }
 
     private int countRightAnswers() {
