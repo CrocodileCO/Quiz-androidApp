@@ -6,21 +6,20 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
 
 import com.crocodile.quiz.R;
+import com.crocodile.quiz.fragment.LoadingFragment;
+import com.crocodile.quiz.fragment.QuestionFragment;
 import com.crocodile.quiz.model.Question;
 import com.crocodile.quiz.rest.ApiClient;
 import com.crocodile.quiz.rest.ServerInterface;
 import com.crocodile.quiz.rest.ServiceGenerator;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -32,18 +31,7 @@ import static com.crocodile.quiz.rest.ApiClient.BASE_URL;
 
 public class QuestionActivity extends AppCompatActivity {
 
-    List<Question> questions;
-    Button button1;
-    Button button2;
-    Button button3;
-    Button button4;
-    List<Button> buttons;
-    Button rightButton;
-    Question qu;
-    ImageView imageView;
-    List<String> answers;
-    RelativeLayout container;
-    Boolean answered = false;
+    Question currentQuestion;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,38 +42,19 @@ public class QuestionActivity extends AppCompatActivity {
         String name = intent.getStringExtra("name");
         setTitle(name);
 
-        button1 =  findViewById(R.id.button1);
-        button2 =  findViewById(R.id.button2);
-        button3 =  findViewById(R.id.button3);
-        button4 =  findViewById(R.id.button4);
-        buttons = new ArrayList<>();
-        buttons.add(button1);
-        buttons.add(button2);
-        buttons.add(button3);
-        buttons.add(button4);
-        imageView = findViewById(R.id.imageViewQuestion);
-        container = findViewById(R.id.containerQuestion);
-
-        for (Button button: buttons) {
-            final Button btn = button;
-            btn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (!answered) {
-                        qu.setPlayerAnswerIndex(buttons.indexOf(btn));
-                        if (!(btn == rightButton)) {
-                            btn.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_false));
-                        }
-
-                        rightButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_true));
-                        answered = true;
-                    }
-                }
-            });
-        }
+        insertLoadingFragment();
 
         loadItems();
 
+    }
+
+    private void insertLoadingFragment() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        LoadingFragment fragment = new LoadingFragment();
+        fragmentTransaction.add(R.id.fragment_container, fragment);
+        fragmentTransaction.commit();
     }
 
 
@@ -100,18 +69,7 @@ public class QuestionActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<Question>> call, Response<List<Question>> response) {
                 int statusCode = response.code();
-                questions = response.body();
-
-                qu = questions.get(0);
-                qu.setup();
-                answers = qu.getShuffledAnswers();
-                for (Button button: buttons) {
-                    button.setText(answers.get(buttons.indexOf(button)));
-                }
-                rightButton = buttons.get(qu.getShuffledRightAnswerIndex());
-
-                new DownloadImageTask(imageView).execute(qu.getImageUrl());
-
+                onQuestionsLoaded(response.body());
             }
 
             @Override
@@ -122,13 +80,34 @@ public class QuestionActivity extends AppCompatActivity {
 
     }
 
+    private void onQuestionsLoaded(List<Question> questions) {
+        currentQuestion = questions.get(0);
+        currentQuestion.setup();
+
+        new DownloadImageTask(this).execute(currentQuestion.getImageUrl());
+    }
+
+    private void onImageDownloaded(Bitmap image) {
+        currentQuestion.setImage(image);
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        QuestionFragment fragment = new QuestionFragment();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("question", currentQuestion);
+        fragment.setArguments(bundle);
+        fragmentTransaction.replace(R.id.fragment_container, fragment);
+        fragmentTransaction.commit();
+    }
+
 
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-        ImageView bmImage;
+        QuestionActivity activity;
 
 
-        private DownloadImageTask(ImageView bmImage) {
-            this.bmImage = bmImage;
+        private DownloadImageTask(QuestionActivity activity) {
+            this.activity = activity;
         }
 
         protected Bitmap doInBackground(String... urls) {
@@ -138,16 +117,13 @@ public class QuestionActivity extends AppCompatActivity {
                 InputStream in = new java.net.URL(urldisplay).openStream();
                 mIcon11 = BitmapFactory.decodeStream(in);
             } catch (Exception e) {
-                //Toast.makeText(context, "", Toast.LENGTH_SHORT).show();
-                //Log.e(TAG, e.getMessage());
                 e.printStackTrace();
             }
             return mIcon11;
         }
 
         protected void onPostExecute(Bitmap result) {
-            bmImage.setImageBitmap(result);
-            container.setVisibility(View.VISIBLE);
+            activity.onImageDownloaded(result);
         }
     }
 

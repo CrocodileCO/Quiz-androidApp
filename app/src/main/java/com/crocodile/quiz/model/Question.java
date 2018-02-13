@@ -1,14 +1,17 @@
 package com.crocodile.quiz.model;
 
+import android.graphics.Bitmap;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class Question {
+public class Question implements Serializable{
 
     @SerializedName("_id")
     @Expose
@@ -37,6 +40,7 @@ public class Question {
     private int shuffledRightAnswerIndex;
     private int playerAnswerIndex;
     private boolean playerAnsweredRight;
+    private Bitmap image;
 
     public void setup() {
         answers = new ArrayList<String>();
@@ -65,6 +69,14 @@ public class Question {
     }
 
     public boolean isPlayerAnsweredRight() { return playerAnsweredRight; }
+
+    public Bitmap getImage() {
+        return image;
+    }
+
+    public void setImage(Bitmap image) {
+        this.image = image;
+    }
 
     public String get_id() {
         return _id;
