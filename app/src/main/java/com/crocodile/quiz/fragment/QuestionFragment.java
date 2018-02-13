@@ -85,24 +85,25 @@ public class QuestionFragment extends Fragment {
 
                         rightButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_true));
                         answered = true;
+                        ((QuestionActivity) getActivity()).setQuestionAnswered();
                     }
                 }
             });
         }
 
-        container.setOnClickListener(new View.OnClickListener() {
+        /*container.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (answered) {
                     showNextQuestion();
                 }
             }
-        });
+        });*/
 
         container.setVisibility(View.VISIBLE);
     }
 
-    private void showNextQuestion() {
+    /*private void showNextQuestion() {
         ((QuestionActivity) getActivity()).showNextQuestion();
-    }
+    }*/
 }

@@ -2,14 +2,15 @@ package com.crocodile.quiz.activity;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.widget.Toast;
 
 import com.crocodile.quiz.R;
@@ -21,7 +22,6 @@ import com.crocodile.quiz.rest.ApiClient;
 import com.crocodile.quiz.rest.ServerInterface;
 import com.crocodile.quiz.rest.ServiceGenerator;
 
-import java.io.InputStream;
 import java.util.List;
 
 import retrofit2.Call;
@@ -33,45 +33,47 @@ import static com.crocodile.quiz.rest.ApiClient.BASE_URL;
 
 public class QuestionActivity extends AppCompatActivity implements DownloadHelper.OnImageDownloadListener{
 
-    List<Question> questions;
-    Question currentQuestion;
-    int currentQuestionIndex;
-    LoadingFragment loadingFragment;
-    QuestionFragment questionFragment;
+    private List<Question> questions;
+    private Question currentQuestion;
+    private int currentQuestionIndex;
+    private Question currentImageDownload;
+    private int currentImageDownloadIndex;
+    private boolean currentQuestionAnswered;
+
+    private GestureDetectorCompat mDetector;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question);
 
+        mDetector = new GestureDetectorCompat(this, new MyGestureListener());
+
         Intent intent = getIntent();
         String name = intent.getStringExtra("name");
         setTitle(name);
 
-        loadingFragment = new LoadingFragment();
+        currentQuestionAnswered = false;
 
         insertLoadingFragment();
 
-        loadItems();
+        loadQuestions();
 
     }
 
     public void showNextQuestion() {
-        insertLoadingFragment();
+        //slideLoadingFragment();
+        currentQuestionAnswered = false;
         currentQuestionIndex++;
-        loadQuestion(currentQuestionIndex);
+        goToQuestion(currentQuestionIndex);
     }
 
-    private void insertLoadingFragment() {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-        fragmentTransaction.replace(R.id.fragment_container, loadingFragment);
-        fragmentTransaction.commit();
+    public void setQuestionAnswered() {
+        currentQuestionAnswered = true;
     }
 
 
-    private void loadItems() {
+    private void loadQuestions() {
         ServerInterface apiService = ServiceGenerator.createService(ServerInterface.class, BASE_URL);
         ApiClient.getClient().create(ServerInterface.class);
 
@@ -93,36 +95,92 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
 
     }
 
-    private void loadQuestion(int index) {
+    private void goToQuestion(int index) {
         if (index < questions.size()) {
             currentQuestion = questions.get(index);
             currentQuestion.setup();
 
-            DownloadHelper.downloadImage(currentQuestion.getImageUrl(), this);
+            if(currentQuestion.getImage() == null) {
+                if (currentQuestionIndex != 0) {
+                    slideLoadingFragment();
+                }
+            } else {
+                slideQuestionFragment();
+            }
+
+            //DownloadHelper.downloadImage(currentQuestion.getImageUrl(), this);
         } else {
+            slideLoadingFragment();
             Toast.makeText(getApplicationContext(), "Quiz ended. Right answers: " + countRightAnswers() + "/" + questions.size() + ".", Toast.LENGTH_LONG).show();
         }
     }
 
     private void onQuestionsLoaded(List<Question> loadedQuestions) {
         this.questions = loadedQuestions;
-        questionFragment = new QuestionFragment();
         currentQuestionIndex = 0;
-        loadQuestion(currentQuestionIndex);
+        goToQuestion(currentQuestionIndex);
+        currentImageDownloadIndex = 0;
+        loadImage(currentImageDownloadIndex);
+    }
+
+    private void loadImage(int index) {
+        if (index < questions.size()) {
+            currentImageDownload = questions.get(index);
+            DownloadHelper.downloadImage(currentImageDownload.getImageUrl(), this);
+        }
     }
 
     public void onImageDownloaded(Bitmap image) {
-        currentQuestion.setImage(image);
-        insertQuestionFragment();
+        currentImageDownload.setImage(image);
+        if (currentImageDownloadIndex == currentQuestionIndex) {
+            insertQuestionFragment();
+        }
+        currentImageDownloadIndex++;
+        loadImage(currentImageDownloadIndex);
+    }
+
+    private void insertLoadingFragment() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        LoadingFragment loadingFragment = new LoadingFragment();
+        fragmentTransaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
+        fragmentTransaction.replace(R.id.fragment_container, loadingFragment);
+        fragmentTransaction.commit();
+    }
+
+    private void slideLoadingFragment() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        LoadingFragment loadingFragment = new LoadingFragment();
+        fragmentTransaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
+        fragmentTransaction.replace(R.id.fragment_container, loadingFragment);
+        fragmentTransaction.commit();
     }
 
     private void insertQuestionFragment() {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
+        QuestionFragment questionFragment = new QuestionFragment();
         Bundle bundle = new Bundle();
         bundle.putSerializable("question", currentQuestion);
         questionFragment.setArguments(bundle);
+        fragmentTransaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
+        fragmentTransaction.replace(R.id.fragment_container, questionFragment);
+        fragmentTransaction.commit();
+    }
+
+    private void slideQuestionFragment() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        QuestionFragment questionFragment = new QuestionFragment();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("question", currentQuestion);
+        questionFragment.setArguments(bundle);
+        fragmentTransaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
         fragmentTransaction.replace(R.id.fragment_container, questionFragment);
         fragmentTransaction.commit();
     }
@@ -133,6 +191,31 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
             result += question.isPlayersAnswerRight() ? 1 : 0;
         }
         return result;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        this.mDetector.onTouchEvent(event);
+        return super.onTouchEvent(event);
+    }
+
+    class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
+        private static final String DEBUG_TAG = "Gestures";
+
+        @Override
+        public boolean onDown(MotionEvent event) {
+            return true;
+        }
+
+        @Override
+        public boolean onFling(MotionEvent event1, MotionEvent event2,
+                               float velocityX, float velocityY) {
+            if ((Math.abs(velocityX) > Math.abs(velocityY)) && velocityX < 0)
+                if (currentQuestionAnswered) {
+                    showNextQuestion();
+                }
+            return true;
+        }
     }
 
 }
