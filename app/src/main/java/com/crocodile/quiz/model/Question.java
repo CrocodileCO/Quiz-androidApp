@@ -3,6 +3,11 @@ package com.crocodile.quiz.model;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public class Question {
 
     @SerializedName("_id")
@@ -26,6 +31,40 @@ public class Question {
     @SerializedName("topicId")
     @Expose
     private String topicId;
+
+    private ArrayList<String> answers;
+    private ArrayList<String> shuffledAnswers;
+    private int shuffledRightAnswerIndex;
+    private int playerAnswerIndex;
+    private boolean playerAnsweredRight;
+
+    public void setup() {
+        answers = new ArrayList<String>();
+        answers.add(answer1);
+        answers.add(answer2);
+        answers.add(answer3);
+        answers.add(answer4);
+
+        shuffledAnswers = new ArrayList<>(getAnswers());
+        Collections.shuffle(shuffledAnswers);
+
+        for (String ans : shuffledAnswers) {
+            if (ans.equals(getRightAnswer())) {
+                shuffledRightAnswerIndex = shuffledAnswers.indexOf(ans);
+            }
+        }
+    }
+
+    public void setPlayerAnswerIndex(int index) {
+        playerAnswerIndex = index;
+        if (playerAnswerIndex == shuffledRightAnswerIndex) {
+            playerAnsweredRight = true;
+        } else {
+            playerAnsweredRight = false;
+        }
+    }
+
+    public boolean isPlayerAnsweredRight() { return playerAnsweredRight; }
 
     public String get_id() {
         return _id;
@@ -82,5 +121,13 @@ public class Question {
     public void setTopicId(String topicId) {
         this.topicId = topicId;
     }
+
+    public String getRightAnswer() { return answer1; }
+
+    public ArrayList<String> getAnswers() {return answers;}
+
+    public ArrayList<String> getShuffledAnswers() {return shuffledAnswers;}
+
+    public int getShuffledRightAnswerIndex() { return shuffledRightAnswerIndex;}
 
 }

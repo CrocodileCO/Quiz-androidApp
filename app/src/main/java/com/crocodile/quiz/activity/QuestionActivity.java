@@ -15,14 +15,13 @@ import android.widget.RelativeLayout;
 
 import com.crocodile.quiz.R;
 import com.crocodile.quiz.model.Question;
-import com.crocodile.quiz.model.TracerUserQuest;
 import com.crocodile.quiz.rest.ApiClient;
 import com.crocodile.quiz.rest.ServerInterface;
 import com.crocodile.quiz.rest.ServiceGenerator;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -38,13 +37,13 @@ public class QuestionActivity extends AppCompatActivity {
     Button button2;
     Button button3;
     Button button4;
+    List<Button> buttons;
     Button rightButton;
     Question qu;
     ImageView imageView;
-    String[] currentMass;
+    List<String> answers;
     RelativeLayout container;
-    Boolean getAnswer = false;
-    TracerUserQuest tracerUserQuest = new TracerUserQuest();
+    Boolean answered = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,66 +58,33 @@ public class QuestionActivity extends AppCompatActivity {
         button2 =  findViewById(R.id.button2);
         button3 =  findViewById(R.id.button3);
         button4 =  findViewById(R.id.button4);
+        buttons = new ArrayList<>();
+        buttons.add(button1);
+        buttons.add(button2);
+        buttons.add(button3);
+        buttons.add(button4);
         imageView = findViewById(R.id.imageViewQuestion);
         container = findViewById(R.id.containerQuestion);
 
-        button1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!getAnswer&&!(qu.getAnswer1().equals(currentMass[0]))) {
-                    button1.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_false));
-                    tracerUserQuest.setAnswer(currentMass[0],false);
-                }else{tracerUserQuest.setAnswer(currentMass[0],true);}
+        for (Button button: buttons) {
+            final Button btn = button;
+            btn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (!answered) {
+                        qu.setPlayerAnswerIndex(buttons.indexOf(btn));
+                        if (!(btn == rightButton)) {
+                            btn.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_false));
+                        }
 
-                rightButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_true));
-                getAnswer = true;
-            }
-        });
-        button2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!getAnswer&&!(qu.getAnswer1().equals(currentMass[1]))) {
-                    button2.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_false));
-                    tracerUserQuest.setAnswer(currentMass[1],false);
-                }else{tracerUserQuest.setAnswer(currentMass[1],true);}
-
-                rightButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_true));
-                getAnswer = true;
-            }
-
-        });
-        button3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!getAnswer&&!(qu.getAnswer1().equals(currentMass[2]))) {
-                    button3.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_false));
-                    tracerUserQuest.setAnswer(currentMass[2],false);
-                }else{tracerUserQuest.setAnswer(currentMass[2],true);}
-
-                rightButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_true));
-                getAnswer = true;
-            }
-
-        });
-        button4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!getAnswer&&!(qu.getAnswer1().equals(currentMass[3]))) {
-                    button4.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_false));
-                    tracerUserQuest.setAnswer(currentMass[3],false);
-                }else{tracerUserQuest.setAnswer(currentMass[3],true);}
-
-                rightButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_true));
-                getAnswer = true;
-            }
-        });
-
-
-        container.setO
+                        rightButton.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_true));
+                        answered = true;
+                    }
+                }
+            });
+        }
 
         loadItems();
-
-
 
     }
 
@@ -136,22 +102,15 @@ public class QuestionActivity extends AppCompatActivity {
                 int statusCode = response.code();
                 questions = response.body();
 
-                qu =questions.get(0);
-                currentMass= new String[]{qu.getAnswer1(), qu.getAnswer2(), qu.getAnswer3(), qu.getAnswer4()};
-                shuffleArray(currentMass);
-                button1.setText(currentMass[0]);
-                if (currentMass[0].equals(qu.getAnswer1())){rightButton=button1;}
-                button2.setText(currentMass[1]);
-                if (currentMass[1].equals(qu.getAnswer1())){rightButton=button2;}
-                button3.setText(currentMass[2]);
-                if (currentMass[2].equals(qu.getAnswer1())){rightButton=button3;}
-                button4.setText(currentMass[3]);
-                if (currentMass[3].equals(qu.getAnswer1())){rightButton=button4;}
-                //imageView.setImageURI(Uri.parse(qu.getImgUrl()));
+                qu = questions.get(0);
+                qu.setup();
+                answers = qu.getShuffledAnswers();
+                for (Button button: buttons) {
+                    button.setText(answers.get(buttons.indexOf(button)));
+                }
+                rightButton = buttons.get(qu.getShuffledRightAnswerIndex());
+
                 new DownloadImageTask(imageView).execute(qu.getImageUrl());
-
-
-
 
             }
 
@@ -160,10 +119,8 @@ public class QuestionActivity extends AppCompatActivity {
                 Log.e("lol", t.toString());
             }
         });
+
     }
-
-
-
 
 
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
@@ -194,15 +151,5 @@ public class QuestionActivity extends AppCompatActivity {
         }
     }
 
-    private static void shuffleArray(String[] ar) {
-        Random rnd = new Random();
-        for (int i = ar.length - 1; i > 0; i--) {
-            int index = rnd.nextInt(i + 1);
-            // Simple swap
-            String a = ar[index];
-            ar[index] = ar[i];
-            ar[i] = a;
-        }
-    }
 
 }
