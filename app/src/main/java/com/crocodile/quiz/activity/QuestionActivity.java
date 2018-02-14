@@ -39,6 +39,7 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
     private Question currentImageDownload;
     private int currentImageDownloadIndex;
     private boolean currentQuestionAnswered;
+    private String topicId;
 
     private GestureDetectorCompat mDetector;
 
@@ -52,6 +53,7 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
         Intent intent = getIntent();
         String name = intent.getStringExtra("name");
         setTitle(name);
+        topicId = intent.getStringExtra("id");
 
         currentQuestionAnswered = false;
 
@@ -78,7 +80,7 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
         ApiClient.getClient().create(ServerInterface.class);
 
 
-        Call<List<Question>> call = apiService.getQuestions();
+        Call<List<Question>> call = apiService.getQuestions(topicId);
 
         call.enqueue(new Callback<List<Question>>() {
             @Override
@@ -116,6 +118,11 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
     }
 
     private void onQuestionsLoaded(List<Question> loadedQuestions) {
+        if (loadedQuestions == null) {
+            //insertLoadingFragment();
+            Toast.makeText(getApplicationContext(), "No questions", Toast.LENGTH_LONG).show();
+            return;
+        }
         this.questions = loadedQuestions;
         currentQuestionIndex = 0;
         goToQuestion(currentQuestionIndex);

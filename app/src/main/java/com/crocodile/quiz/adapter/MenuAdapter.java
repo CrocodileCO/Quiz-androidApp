@@ -76,6 +76,7 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.ViewHolder> {
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), QuestionActivity.class);
                 intent.putExtra("name",topic.getTitle());
+                intent.putExtra("id", topic.get_id());
                 v.getContext().startActivity(intent);
             }
         });
