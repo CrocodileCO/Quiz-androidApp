@@ -18,11 +18,15 @@
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"
        />
+
     <TextView
         android:id="@+id/textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/imageview"
         android:layout_centerInParent="true"
-        android:gravity="center"/>
+        android:fontFamily="@font/lora"
+        android:gravity="center"
+        android:textColor="@android:color/white" />
 
 </RelativeLayout>

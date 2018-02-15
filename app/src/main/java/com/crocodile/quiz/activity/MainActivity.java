@@ -3,6 +3,7 @@ package com.crocodile.quiz.activity;
 import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -46,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements DownloadHelper.On
 
         mRecyclerView.setHasFixedSize(true);
 
-        mLayoutManager = new LinearLayoutManager(this);
+        mLayoutManager = new GridLayoutManager(this,3);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         loadItems();

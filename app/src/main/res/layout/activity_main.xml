@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#524E4E"
     tools:context="com.crocodile.quiz.activity.MainActivity">
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/my_recycler_view"
         android:scrollbars="vertical"
