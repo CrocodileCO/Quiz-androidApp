@@ -6,7 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
 
-    public static final String BASE_URL = "http://10.0.2.2:3000/api/";
+    public static final String BASE_URL = "https://eggdance.herokuapp.com/api/";
     private static Retrofit retrofit = null;
 
     public static Retrofit getClient() {
