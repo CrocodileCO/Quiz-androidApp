@@ -8,9 +8,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 public class Question implements Serializable{
 
@@ -35,6 +33,19 @@ public class Question implements Serializable{
     @SerializedName("topicId")
     @Expose
     private String topicId;
+    @SerializedName("answer1_num")
+    @Expose
+    private int answer1_num;
+    @SerializedName("answer2_num")
+    @Expose
+    private int answer2_num;
+    @SerializedName("answer3_num")
+    @Expose
+    private int answer3_num;
+    @SerializedName("answer4_num")
+    @Expose
+
+    private int answer4_num;
 
     private ArrayList<String> answers;
     private ArrayList<String> shuffledAnswers;
@@ -139,6 +150,33 @@ public class Question implements Serializable{
         this.topicId = topicId;
     }
 
+    public void setAnswer1_num(int answer1_num) { this.answer1_num = answer1_num; }
+
+    public int getAnswer1_num() { return answer1_num; }
+
+    public void setAnswer2_num(int answer2_num) { this.answer2_num = answer2_num; }
+
+    public int getAnswer2_num() {
+        return answer2_num;
+    }
+
+    public void setAnswer3_num(int answer3_num) {
+        this.answer3_num = answer3_num;
+    }
+
+    public int getAnswer3_num() {
+        return answer3_num;
+    }
+
+    public int getAnswer4_num() {
+        return answer4_num;
+    }
+
+    public void setAnswer4_num(int answer4_num) {
+        this.answer4_num = answer4_num;
+    }
+
+
     public String getRightAnswer() { return answer1; }
 
     public ArrayList<String> getAnswers() {return answers;}
@@ -146,5 +184,7 @@ public class Question implements Serializable{
     public ArrayList<String> getShuffledAnswers() {return shuffledAnswers;}
 
     public int getShuffledRightAnswerIndex() { return shuffledRightAnswerIndex;}
+
+    public int getPlayerAnswerIndex(){return playerAnswerIndex;}
 
 }

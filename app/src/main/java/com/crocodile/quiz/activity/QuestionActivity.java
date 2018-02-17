@@ -17,6 +17,7 @@ import com.crocodile.quiz.R;
 import com.crocodile.quiz.fragment.LoadingFragment;
 import com.crocodile.quiz.fragment.QuestionFragment;
 import com.crocodile.quiz.helper.DownloadHelper;
+import com.crocodile.quiz.helper.SetStatistics;
 import com.crocodile.quiz.model.Question;
 import com.crocodile.quiz.rest.ApiClient;
 import com.crocodile.quiz.rest.ServerInterface;
@@ -113,6 +114,9 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
             //DownloadHelper.downloadImage(currentQuestion.getImageUrl(), this);
         } else {
             slideLoadingFragment();
+
+            new SetStatistics().execute(questions);
+
             Toast.makeText(getApplicationContext(), "Quiz ended. Right answers: " + countRightAnswers() + "/" + questions.size() + ".", Toast.LENGTH_LONG).show();
         }
     }
