@@ -2,6 +2,7 @@ package com.crocodile.quiz.model;
 
 import android.graphics.Bitmap;
 
+import com.crocodile.quiz.helper.ProxyBitmap;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -40,7 +41,7 @@ public class Question implements Serializable{
     private int shuffledRightAnswerIndex;
     private int playerAnswerIndex;
     private boolean playerAnsweredRight;
-    private Bitmap image;
+    private ProxyBitmap image;
 
     public void setup() {
         answers = new ArrayList<String>();
@@ -71,11 +72,15 @@ public class Question implements Serializable{
     public boolean isPlayersAnswerRight() { return playerAnsweredRight; }
 
     public Bitmap getImage() {
-        return image;
+        if (image != null) {
+            return image.getBitmap();
+        } else {
+            return null;
+        }
     }
 
     public void setImage(Bitmap image) {
-        this.image = image;
+        this.image = new ProxyBitmap(image);
     }
 
     public String get_id() {
