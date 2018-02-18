@@ -148,7 +148,9 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
     }
 
     public void onImageDownloaded(Bitmap image) {
-        currentImageDownload.setImage(image);
+        if (image != null) {
+            currentImageDownload.setImage(image);
+        }
         if (currentImageDownloadIndex == currentQuestionIndex) {
             insertQuestionFragment();
         }
