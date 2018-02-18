@@ -185,6 +185,14 @@ public class Question implements Serializable{
 
     public int getShuffledRightAnswerIndex() { return shuffledRightAnswerIndex;}
 
-    public int getPlayerAnswerIndex(){return playerAnswerIndex;}
+    public int getPlayerAnswerIndex() {
 
+        for (String ans : answers) {
+            if (ans.equals(shuffledAnswers.get(playerAnswerIndex))) {
+                return answers.indexOf(ans);
+            }
+        }
+
+        return -1;
+    }
 }
