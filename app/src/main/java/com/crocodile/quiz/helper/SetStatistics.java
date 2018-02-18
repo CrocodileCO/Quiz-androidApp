@@ -16,9 +16,6 @@ import retrofit2.Response;
 
 import static com.crocodile.quiz.rest.ApiClient.BASE_URL;
 
-/**
- * Created by vshir on 17.02.2018.
- */
 
 public class SetStatistics extends AsyncTask<List<Question>,Void,Void>{
 
@@ -35,7 +32,7 @@ public class SetStatistics extends AsyncTask<List<Question>,Void,Void>{
             call.enqueue(new Callback<Void>() {
                 @Override
                 public void onResponse(Call<Void> call, Response<Void> response) {
-                    Log.d("setStatistic","sucsess");
+                    Log.d("setStatistic","success");
                 }
 
                 @Override

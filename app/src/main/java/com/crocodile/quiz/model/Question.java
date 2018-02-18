@@ -44,27 +44,31 @@ public class Question implements Serializable{
     private int answer3_num;
     @SerializedName("answer4_num")
     @Expose
-
     private int answer4_num;
 
-    private ArrayList<String> answers;
-    private ArrayList<String> shuffledAnswers;
+    @SerializedName("answers")
+    @Expose
+    private ArrayList<Answer> answers;
+
+
+    private ArrayList<Answer> shuffledAnswers;
     private int shuffledRightAnswerIndex;
     private int playerAnswerIndex;
     private boolean playerAnsweredRight;
     private ProxyBitmap image;
 
     public void setup() {
-        answers = new ArrayList<String>();
-        answers.add(answer1);
-        answers.add(answer2);
-        answers.add(answer3);
-        answers.add(answer4);
+        /*answers = new ArrayList<Answer>();
+        answers.add(new Answer(answer1, answer1_num));
+        answers.add(new Answer(answer2, answer2_num));
+        answers.add(new Answer(answer3, answer3_num));
+        answers.add(new Answer(answer4, answer4_num));*/
+
 
         shuffledAnswers = new ArrayList<>(getAnswers());
         Collections.shuffle(shuffledAnswers);
 
-        for (String ans : shuffledAnswers) {
+        for (Answer ans : shuffledAnswers) {
             if (ans.equals(getRightAnswer())) {
                 shuffledRightAnswerIndex = shuffledAnswers.indexOf(ans);
             }
@@ -177,22 +181,37 @@ public class Question implements Serializable{
     }
 
 
-    public String getRightAnswer() { return answer1; }
+    public Answer getRightAnswer() { return answers.get(0); }
 
-    public ArrayList<String> getAnswers() {return answers;}
+    public ArrayList<Answer> getAnswers() {return answers;}
 
-    public ArrayList<String> getShuffledAnswers() {return shuffledAnswers;}
+    public ArrayList<Answer> getShuffledAnswers() {return shuffledAnswers;}
 
     public int getShuffledRightAnswerIndex() { return shuffledRightAnswerIndex;}
 
+    public int getShuffledPlayerAnswerIndex() { return playerAnswerIndex;}
+
     public int getPlayerAnswerIndex() {
 
-        for (String ans : answers) {
+        for (Answer ans : answers) {
             if (ans.equals(shuffledAnswers.get(playerAnswerIndex))) {
                 return answers.indexOf(ans);
             }
         }
 
         return -1;
+    }
+
+    public int getShuffledAnswerPercentage(int index) {
+        int sum = getAnswersNumSum();
+        return (sum > 0) ?  (int) Math.round(((double) shuffledAnswers.get(index).getPickAmount() / (double) sum) * 100) : 0;
+    }
+
+    public int getAnswersNumSum() {
+        int sum = 0;
+        for (Answer answer: answers) {
+            sum += answer.getPickAmount();
+        }
+        return sum;
     }
 }
