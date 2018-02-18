@@ -14,6 +14,7 @@ import android.widget.FrameLayout.LayoutParams;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -81,6 +82,7 @@ public class QuestionFragment extends Fragment {
             });
         }
 
+
         answered = false;
         question = (Question) getArguments().getSerializable("question");
 
@@ -89,6 +91,7 @@ public class QuestionFragment extends Fragment {
     }
 
     private void setupQuestion() {
+        buttons.get(0).setText("kek");
         answers = question.getShuffledAnswers();
         for (ButtonContainer button: buttons) {
             button.setCurrentText(answers.get(buttons.indexOf(button)).getText());
@@ -157,11 +160,15 @@ public class QuestionFragment extends Fragment {
         }
 
         public void setCurrentText(String text) {
-            textSwitcher.setCurrentText(text);
+
+            //textSwitcher.setCurrentText(text);
+            setText(text);
         }
 
         public void setText(String text) {
-            textSwitcher.setText(text);
+
+            button.setText(text);
+            //textSwitcher.setText(text);
         }
 
         public void switchText() {
