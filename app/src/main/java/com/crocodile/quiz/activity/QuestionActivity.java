@@ -1,16 +1,13 @@
 package com.crocodile.quiz.activity;
 
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GestureDetectorCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -22,6 +19,7 @@ import com.crocodile.quiz.fragment.ExitTestDialogFragment;
 import com.crocodile.quiz.fragment.ExitTestResultHandler;
 import com.crocodile.quiz.fragment.LoadingFragment;
 import com.crocodile.quiz.fragment.QuestionFragment;
+import com.crocodile.quiz.fragment.ResultFragment;
 import com.crocodile.quiz.helper.DownloadHelper;
 import com.crocodile.quiz.helper.SetStatistics;
 import com.crocodile.quiz.model.Question;
@@ -119,11 +117,11 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
 
             //DownloadHelper.downloadImage(currentQuestion.getImageUrl(), this);
         } else {
-            slideLoadingFragment();
+            slideResultFragment();
 
             new SetStatistics().execute(questions);
 
-            Toast.makeText(getApplicationContext(), "Quiz ended. Right answers: " + countRightAnswers() + "/" + questions.size() + ".", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(), "Quiz ended. Right answers: " + countRightAnswers() + "/" + questions.size() + ".", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -159,48 +157,57 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
     }
 
     private void insertLoadingFragment() {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-        LoadingFragment loadingFragment = new LoadingFragment();
-        fragmentTransaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
-        fragmentTransaction.replace(R.id.fragment_container, loadingFragment);
-        fragmentTransaction.commit();
+        insertFragment(new LoadingFragment());
     }
 
     private void slideLoadingFragment() {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-        LoadingFragment loadingFragment = new LoadingFragment();
-        fragmentTransaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
-        fragmentTransaction.replace(R.id.fragment_container, loadingFragment);
-        fragmentTransaction.commit();
+        slideFragment(new LoadingFragment());
     }
 
     private void insertQuestionFragment() {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-        QuestionFragment questionFragment = new QuestionFragment();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("question", currentQuestion);
-        questionFragment.setArguments(bundle);
-        fragmentTransaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
-        fragmentTransaction.replace(R.id.fragment_container, questionFragment);
-        fragmentTransaction.commit();
+        insertFragment(createQuestionFragment(currentQuestion));
     }
 
     private void slideQuestionFragment() {
+        slideFragment(createQuestionFragment(currentQuestion));
+    }
+
+    private void slideResultFragment() {
+        slideFragment(createResultFragment(countRightAnswers(), questions.size()));
+    }
+
+    private ResultFragment createResultFragment(int rightAnswers, int totalAnswers) {
+        ResultFragment resultFragment = new ResultFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt("rightAnswers", rightAnswers);
+        bundle.putInt("totalAnswers", totalAnswers);
+        resultFragment.setArguments(bundle);
+        return resultFragment;
+    }
+
+    private QuestionFragment createQuestionFragment(Question question) {
+        QuestionFragment questionFragment = new QuestionFragment();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("question", question);
+        questionFragment.setArguments(bundle);
+        return questionFragment;
+    }
+
+    private void insertFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-        QuestionFragment questionFragment = new QuestionFragment();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("question", currentQuestion);
-        questionFragment.setArguments(bundle);
+        fragmentTransaction.setCustomAnimations(R.anim.fade_in, R.anim.fade_out);
+        fragmentTransaction.replace(R.id.fragment_container, fragment);
+        fragmentTransaction.commit();
+    }
+
+    private void slideFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
         fragmentTransaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
-        fragmentTransaction.replace(R.id.fragment_container, questionFragment);
+        fragmentTransaction.replace(R.id.fragment_container, fragment);
         fragmentTransaction.commit();
     }
 
@@ -239,12 +246,14 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
 
     @Override
     public void onBackPressed() {
-        if (currentQuestionIndex < questions.size()) {
-            ExitTestDialogFragment dialogFragment = new ExitTestDialogFragment();
-            dialogFragment.show(getSupportFragmentManager(), "lol");
-        } else {
-            ExitTest();
+        if (questions != null) {
+            if (currentQuestionIndex < questions.size()) {
+                ExitTestDialogFragment dialogFragment = new ExitTestDialogFragment();
+                dialogFragment.show(getSupportFragmentManager(), "lol");
+                return;
+            }
         }
+        ExitTest();
     }
 
     @Override

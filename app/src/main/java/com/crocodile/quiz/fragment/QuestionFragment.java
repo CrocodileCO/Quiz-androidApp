@@ -118,7 +118,9 @@ public class QuestionFragment extends Fragment {
                         answered = true;
                         ((QuestionActivity) getActivity()).setQuestionAnswered();
                     } else {
-                        bc.switchText();
+                        for (ButtonContainer button : buttons) {
+                            button.switchText();
+                        }
                     }
                 }
             });
