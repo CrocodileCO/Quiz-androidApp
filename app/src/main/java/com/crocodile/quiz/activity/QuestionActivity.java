@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Toast;
 
 import com.crocodile.quiz.R;
@@ -240,6 +241,19 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
                 if (currentQuestionAnswered) {
                     showNextQuestion();
                 }
+            return true;
+        }
+
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+            if (currentQuestionAnswered) {
+                Intent intent = new Intent(getApplicationContext(), QuestionAbout.class);
+                intent.putExtra("about", "hello bob");
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                getApplicationContext().startActivity(intent);
+
+
+            }
             return true;
         }
     }

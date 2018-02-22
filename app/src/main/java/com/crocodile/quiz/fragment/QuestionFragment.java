@@ -2,6 +2,7 @@ package com.crocodile.quiz.fragment;
 
 
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -21,6 +22,7 @@ import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.crocodile.quiz.R;
+import com.crocodile.quiz.activity.QuestionAbout;
 import com.crocodile.quiz.activity.QuestionActivity;
 import com.crocodile.quiz.model.Answer;
 import com.crocodile.quiz.model.Question;
@@ -125,6 +127,7 @@ public class QuestionFragment extends Fragment {
                 }
             });
         }
+
 
         /*container.setOnClickListener(new View.OnClickListener() {
             @Override
