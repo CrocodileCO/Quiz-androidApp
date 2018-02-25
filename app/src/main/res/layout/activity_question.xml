@@ -1,13 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.crocodile.quiz.activity.MainActivity"
     android:background="@color/windowBackground"
-    android:id="@+id/fragment_container">
+    android:id="@+id/main_container">
 
+    <RelativeLayout
+        android:id="@+id/top_bar_container"
+        android:layout_width="match_parent"
+        android:layout_height="40sp">
+        <RelativeLayout
+            android:id="@+id/tracker_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toLeftOf="@id/info_button">
 
+        </RelativeLayout>
+        <ImageView
+            android:id="@+id/info_button"
+            android:layout_width="40sp"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:padding="8sp"
+            android:src="@drawable/info"/>
+    </RelativeLayout>
 
-</android.support.constraint.ConstraintLayout>
+    <RelativeLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/top_bar_container">
+
+    </RelativeLayout>
+
+</RelativeLayout>
+

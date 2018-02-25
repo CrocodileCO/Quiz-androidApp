@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.crocodile.quiz.R;
@@ -26,6 +27,7 @@ import com.crocodile.quiz.model.Question;
 import com.crocodile.quiz.rest.ApiClient;
 import com.crocodile.quiz.rest.ServerInterface;
 import com.crocodile.quiz.rest.ServiceGenerator;
+import com.crocodile.quiz.views.QuestionsTrackerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +50,9 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
     private String topicId;
     private boolean statisticSent;
 
+    private RelativeLayout trackerFrame;
+    private QuestionsTrackerView trackerView;
+
     private GestureDetectorCompat mDetector;
 
     private List<QuestionFragment> questionFragments;
@@ -58,6 +63,7 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
         setContentView(R.layout.activity_question);
 
         mDetector = new GestureDetectorCompat(this, new MyGestureListener());
+        trackerFrame = findViewById(R.id.tracker_container);
 
         Intent intent = getIntent();
         String name = intent.getStringExtra("name");
@@ -91,6 +97,7 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
 
     public void setQuestionAnswered() {
         //currentQuestionAnswered = true;
+        trackerView.postInvalidate();
     }
 
 
@@ -117,6 +124,8 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
     }
 
     private void goToQuestion(int index, boolean direction) {
+        trackerView.setCurrentQuestion(index);
+        trackerView.postInvalidate();
         if (index < questions.size()) {
             currentQuestion = questions.get(index);
             //currentQuestion.setup();
@@ -152,6 +161,10 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
         for (Question qst : questions) {
             qst.setup();
         }
+
+        trackerView = new QuestionsTrackerView(trackerFrame.getContext(), trackerFrame, questions);
+        trackerFrame.addView(trackerView);
+
         currentQuestionIndex = 0;
         goToQuestion(currentQuestionIndex, true);
         currentImageDownloadIndex = 0;
