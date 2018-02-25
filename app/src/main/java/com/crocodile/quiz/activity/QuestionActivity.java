@@ -88,6 +88,7 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
         }
     }
 
+
     public void setQuestionAnswered() {
         //currentQuestionAnswered = true;
     }
@@ -266,8 +267,10 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
         public boolean onFling(MotionEvent event1, MotionEvent event2,
                                float velocityX, float velocityY) {
             if ((Math.abs(velocityX) > Math.abs(velocityY))) {
-                if ((velocityX < 0) && (isCurrentQuestionAnswered())) {
+                if (velocityX < 0) {
+                    if ((isCurrentQuestionAnswered()) && (currentQuestionIndex < questions.size())){
                         showNextQuestion();
+                    }
                 } else {
                         showPreviousQuestion();
                 }
