@@ -61,15 +61,7 @@
                             android:text=""
                             android:textColor="@android:color/white" />
 
-                        <TextSwitcher
-                            android:id="@+id/textSwitcher1"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_alignParentLeft="true"
-                            android:layout_alignParentBottom="true"
-                            android:layout_alignParentRight="true"
-                            android:layout_alignParentTop="true"
-                            android:layout_gravity="center"/>
+
                     </RelativeLayout>
 
                     <RelativeLayout
@@ -88,15 +80,7 @@
                             android:text=""
                             android:textColor="@android:color/white" />
 
-                        <TextSwitcher
-                            android:id="@+id/textSwitcher2"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_alignParentLeft="true"
-                            android:layout_alignParentBottom="true"
-                            android:layout_alignParentRight="true"
-                            android:layout_alignParentTop="true"
-                            android:layout_gravity="center"/>
+
                     </RelativeLayout>
 
 
@@ -123,15 +107,7 @@
                             android:text=""
                             android:textColor="@android:color/white" />
 
-                        <TextSwitcher
-                            android:id="@+id/textSwitcher3"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_alignParentLeft="true"
-                            android:layout_alignParentBottom="true"
-                            android:layout_alignParentRight="true"
-                            android:layout_alignParentTop="true"
-                            android:layout_gravity="center"/>
+
                     </RelativeLayout>
 
 
@@ -151,15 +127,7 @@
                             android:text=""
                             android:textColor="@android:color/white" />
 
-                        <TextSwitcher
-                            android:id="@+id/textSwitcher4"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_alignParentLeft="true"
-                            android:layout_alignParentBottom="true"
-                            android:layout_alignParentRight="true"
-                            android:layout_alignParentTop="true"
-                            android:layout_gravity="center"/>
+
                     </RelativeLayout>
 
                 </LinearLayout>

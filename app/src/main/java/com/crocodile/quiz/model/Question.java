@@ -30,9 +30,11 @@ public class Question implements Serializable{
     private int shuffledRightAnswerIndex;
     private int playerAnswerIndex;
     private boolean playerAnsweredRight;
+    private boolean playerAnswered;
     private ProxyBitmap image;
 
     public void setup() {
+        playerAnswered = false;
         shuffledAnswers = new ArrayList<>(getAnswers());
         Collections.shuffle(shuffledAnswers);
 
@@ -44,6 +46,7 @@ public class Question implements Serializable{
     }
 
     public void setPlayerAnswerIndex(int index) {
+        playerAnswered = true;
         playerAnswerIndex = index;
         if (playerAnswerIndex == shuffledRightAnswerIndex) {
             playerAnsweredRight = true;
@@ -51,6 +54,8 @@ public class Question implements Serializable{
             playerAnsweredRight = false;
         }
     }
+
+    public boolean isAnswered() { return playerAnswered; }
 
     public boolean isPlayersAnswerRight() { return playerAnsweredRight; }
 

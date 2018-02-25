@@ -42,8 +42,6 @@ public class QuestionFragment extends Fragment {
     ImageView imageView;
     List<Answer> answers;
     RelativeLayout container;
-    Boolean answered;
-    TextSwitcher textSwitcher;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,34 +59,20 @@ public class QuestionFragment extends Fragment {
         button3 =  getActivity().findViewById(R.id.button3);
         button4 =  getActivity().findViewById(R.id.button4);
         buttons = new ArrayList<>();
-        buttons.add(new ButtonContainer(button1, (TextSwitcher) getActivity().findViewById(R.id.textSwitcher1)));
-        buttons.add(new ButtonContainer(button2, (TextSwitcher) getActivity().findViewById(R.id.textSwitcher2)));
-        buttons.add(new ButtonContainer(button3, (TextSwitcher) getActivity().findViewById(R.id.textSwitcher3)));
-        buttons.add(new ButtonContainer(button4, (TextSwitcher) getActivity().findViewById(R.id.textSwitcher4)));
+        buttons.add(new ButtonContainer(button1));
+        buttons.add(new ButtonContainer(button2));
+        buttons.add(new ButtonContainer(button3));
+        buttons.add(new ButtonContainer(button4));
         imageView = getActivity().findViewById(R.id.imageViewQuestion);
         container = getActivity().findViewById(R.id.containerQuestion);
-        for (ButtonContainer bc : buttons) {
-            textSwitcher = bc.getTextSwitcher();
-            textSwitcher.setInAnimation(getContext(), android.R.anim.fade_in);
-            textSwitcher.setOutAnimation(getContext(), android.R.anim.fade_out);
-            textSwitcher.setFactory(new ViewSwitcher.ViewFactory() {
-                @Override
-                public View makeView() {
-                    TextView view = new TextView(getContext());
-                    view.setTextColor(Color.WHITE);
-                    view.setGravity(Gravity.CENTER);
-                    view.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-                    view.setAllCaps(true);
-                    return view;
-                }
-            });
-        }
 
 
-        answered = false;
         question = (Question) getArguments().getSerializable("question");
 
         setupQuestion();
+        if (question.isAnswered()) {
+            colorButtons(question.getShuffledPlayerAnswerIndex());
+        }
 
     }
 
@@ -96,7 +80,7 @@ public class QuestionFragment extends Fragment {
         buttons.get(0).setText("kek");
         answers = question.getShuffledAnswers();
         for (ButtonContainer button: buttons) {
-            button.setCurrentText(answers.get(buttons.indexOf(button)).getText());
+            button.setText(answers.get(buttons.indexOf(button)).getText());
         }
 
         rightButton = buttons.get(question.getShuffledRightAnswerIndex());
@@ -110,14 +94,9 @@ public class QuestionFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     int index = buttons.indexOf(bc);
-                    if (!answered) {
+                    if (!question.isAnswered()) {
                         question.setPlayerAnswerIndex(index);
-                        if (!(bc == rightButton)) {
-                            btn.setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_false));
-                        }
-
-                        rightButton.getButton().setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_true));
-                        answered = true;
+                        colorButtons(index);
                         ((QuestionActivity) getActivity()).setQuestionAnswered();
                     } else {
                         for (ButtonContainer button : buttons) {
@@ -128,52 +107,36 @@ public class QuestionFragment extends Fragment {
             });
         }
 
-
-        /*container.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (answered) {
-                    showNextQuestion();
-                }
-            }
-        });*/
-
         container.setVisibility(View.VISIBLE);
     }
 
-    /*private void showNextQuestion() {
-        ((QuestionActivity) getActivity()).showNextQuestion();
-    }*/
+    private void colorButtons(int playerAnswerIndex) {
+        ButtonContainer bc = buttons.get(playerAnswerIndex);
+        if (!(bc == rightButton)) {
+            bc.getButton().setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_false));
+        }
+
+        rightButton.getButton().setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_true));
+    }
+
 
     private class ButtonContainer {
         private Button button;
-        private TextSwitcher textSwitcher;
         private ButtonState state;
 
-        public ButtonContainer(Button button, TextSwitcher textSwitcher) {
+        public ButtonContainer(Button button) {
             this.button = button;
-            this.textSwitcher = textSwitcher;
             state = ButtonState.ANSWER;
         }
 
-        public TextSwitcher getTextSwitcher() {
-            return textSwitcher;
-        }
 
         public Button getButton() {
             return button;
         }
 
-        public void setCurrentText(String text) {
-
-            //textSwitcher.setCurrentText(text);
-            setText(text);
-        }
 
         public void setText(String text) {
-
             button.setText(text);
-            //textSwitcher.setText(text);
         }
 
         public void switchText() {

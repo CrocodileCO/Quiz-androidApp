@@ -12,7 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.Toast;
 
 import com.crocodile.quiz.R;
@@ -28,6 +27,7 @@ import com.crocodile.quiz.rest.ApiClient;
 import com.crocodile.quiz.rest.ServerInterface;
 import com.crocodile.quiz.rest.ServiceGenerator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -44,10 +44,13 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
     private int currentQuestionIndex;
     private Question currentImageDownload;
     private int currentImageDownloadIndex;
-    private boolean currentQuestionAnswered;
+    //private boolean currentQuestionAnswered;
     private String topicId;
+    private boolean statisticSent;
 
     private GestureDetectorCompat mDetector;
+
+    private List<QuestionFragment> questionFragments;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,7 +64,9 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
         setTitle(name);
         topicId = intent.getStringExtra("id");
 
-        currentQuestionAnswered = false;
+        //currentQuestionAnswered = false;
+        questionFragments = new ArrayList<>();
+        statisticSent = false;
 
         insertLoadingFragment();
 
@@ -71,13 +76,20 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
 
     public void showNextQuestion() {
         //slideLoadingFragment();
-        currentQuestionAnswered = false;
+        //currentQuestionAnswered = false;
         currentQuestionIndex++;
-        goToQuestion(currentQuestionIndex);
+        goToQuestion(currentQuestionIndex, true);
+    }
+
+    public void showPreviousQuestion() {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            goToQuestion(currentQuestionIndex, false);
+        }
     }
 
     public void setQuestionAnswered() {
-        currentQuestionAnswered = true;
+        //currentQuestionAnswered = true;
     }
 
 
@@ -103,24 +115,27 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
 
     }
 
-    private void goToQuestion(int index) {
+    private void goToQuestion(int index, boolean direction) {
         if (index < questions.size()) {
             currentQuestion = questions.get(index);
-            currentQuestion.setup();
+            //currentQuestion.setup();
 
             if(currentQuestion.getImage() == null) {
                 if (currentQuestionIndex != 0) {
                     slideLoadingFragment();
                 }
             } else {
-                slideQuestionFragment();
+                slideQuestionFragment(direction);
             }
 
             //DownloadHelper.downloadImage(currentQuestion.getImageUrl(), this);
         } else {
             slideResultFragment();
 
-            new SetStatistics().execute(questions);
+            if (!statisticSent) {
+                statisticSent = true;
+                new SetStatistics().execute(questions);
+            }
 
             //Toast.makeText(getApplicationContext(), "Quiz ended. Right answers: " + countRightAnswers() + "/" + questions.size() + ".", Toast.LENGTH_LONG).show();
         }
@@ -133,8 +148,11 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
             return;
         }
         this.questions = loadedQuestions;
+        for (Question qst : questions) {
+            qst.setup();
+        }
         currentQuestionIndex = 0;
-        goToQuestion(currentQuestionIndex);
+        goToQuestion(currentQuestionIndex, true);
         currentImageDownloadIndex = 0;
         loadImage(currentImageDownloadIndex);
     }
@@ -162,22 +180,22 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
     }
 
     private void slideLoadingFragment() {
-        slideFragment(new LoadingFragment());
+        slideFragment(new LoadingFragment(), true);
     }
 
     private void insertQuestionFragment() {
-        insertFragment(createQuestionFragment(currentQuestion));
+        insertFragment(getQuestionFragment(currentQuestion));
     }
 
-    private void slideQuestionFragment() {
-        slideFragment(createQuestionFragment(currentQuestion));
+    private void slideQuestionFragment(boolean direction) {
+        slideFragment(getQuestionFragment(currentQuestion), direction);
     }
 
     private void slideResultFragment() {
-        slideFragment(createResultFragment(countRightAnswers(), questions.size()));
+        slideFragment(getResultFragment(countRightAnswers(), questions.size()), true);
     }
 
-    private ResultFragment createResultFragment(int rightAnswers, int totalAnswers) {
+    private ResultFragment getResultFragment(int rightAnswers, int totalAnswers) {
         ResultFragment resultFragment = new ResultFragment();
         Bundle bundle = new Bundle();
         bundle.putInt("rightAnswers", rightAnswers);
@@ -186,11 +204,18 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
         return resultFragment;
     }
 
-    private QuestionFragment createQuestionFragment(Question question) {
-        QuestionFragment questionFragment = new QuestionFragment();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("question", question);
-        questionFragment.setArguments(bundle);
+    private QuestionFragment getQuestionFragment(Question question) {
+        int index = questions.indexOf(question);
+        QuestionFragment questionFragment;
+        if (index < questionFragments.size()) {
+            questionFragment = questionFragments.get(index);
+        } else {
+            questionFragment = new QuestionFragment();
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("question", question);
+            questionFragment.setArguments(bundle);
+            questionFragments.add(questionFragment);
+        }
         return questionFragment;
     }
 
@@ -203,11 +228,14 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
         fragmentTransaction.commit();
     }
 
-    private void slideFragment(Fragment fragment) {
+    private void slideFragment(Fragment fragment, boolean direction) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-        fragmentTransaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
+        if (direction) {
+            fragmentTransaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
+        } else {
+            fragmentTransaction.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right);
+        }
         fragmentTransaction.replace(R.id.fragment_container, fragment);
         fragmentTransaction.commit();
     }
@@ -237,16 +265,20 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
         @Override
         public boolean onFling(MotionEvent event1, MotionEvent event2,
                                float velocityX, float velocityY) {
-            if ((Math.abs(velocityX) > Math.abs(velocityY)) && velocityX < 0)
-                if (currentQuestionAnswered) {
-                    showNextQuestion();
+            if ((Math.abs(velocityX) > Math.abs(velocityY))) {
+                if ((velocityX < 0) && (isCurrentQuestionAnswered())) {
+                        showNextQuestion();
+                } else {
+                        showPreviousQuestion();
                 }
+            }
+
             return true;
         }
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
-            if (currentQuestionAnswered) {
+            if (isCurrentQuestionAnswered()) {
                 Intent intent = new Intent(getApplicationContext(), QuestionAbout.class);
                 intent.putExtra("about", "hello bob");
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -256,6 +288,10 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
             }
             return true;
         }
+    }
+
+    private boolean isCurrentQuestionAnswered() {
+        return ((currentQuestion != null) && (currentQuestion.isAnswered()));
     }
 
     @Override
