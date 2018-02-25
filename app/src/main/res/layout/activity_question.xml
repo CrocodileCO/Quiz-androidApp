@@ -21,6 +21,7 @@
         </RelativeLayout>
         <ImageView
             android:id="@+id/info_button"
+            android:visibility="invisible"
             android:layout_width="40sp"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"

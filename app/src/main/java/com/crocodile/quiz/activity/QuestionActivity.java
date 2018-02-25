@@ -12,6 +12,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -52,6 +54,7 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
 
     private RelativeLayout trackerFrame;
     private QuestionsTrackerView trackerView;
+    private ImageView informationButton;
 
     private GestureDetectorCompat mDetector;
 
@@ -64,6 +67,7 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
 
         mDetector = new GestureDetectorCompat(this, new MyGestureListener());
         trackerFrame = findViewById(R.id.tracker_container);
+        informationButton = findViewById(R.id.info_button);
 
         Intent intent = getIntent();
         String name = intent.getStringExtra("name");
@@ -162,6 +166,13 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
             qst.setup();
         }
 
+        informationButton.setVisibility(View.VISIBLE);
+        informationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showInformation();
+            }
+        });
         trackerView = new QuestionsTrackerView(trackerFrame.getContext(), trackerFrame, questions);
         trackerFrame.addView(trackerView);
 
@@ -169,6 +180,15 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
         goToQuestion(currentQuestionIndex, true);
         currentImageDownloadIndex = 0;
         loadImage(currentImageDownloadIndex);
+    }
+
+    private void showInformation() {
+        if (isCurrentQuestionAnswered()) {
+            Intent intent = new Intent(getApplicationContext(), QuestionAbout.class);
+            intent.putExtra("about", "hello bob");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            getApplicationContext().startActivity(intent);
+        }
     }
 
     private void loadImage(int index) {
@@ -289,19 +309,6 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
                 }
             }
 
-            return true;
-        }
-
-        @Override
-        public boolean onSingleTapConfirmed(MotionEvent e) {
-            if (isCurrentQuestionAnswered()) {
-                Intent intent = new Intent(getApplicationContext(), QuestionAbout.class);
-                intent.putExtra("about", "hello bob");
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                getApplicationContext().startActivity(intent);
-
-
-            }
             return true;
         }
     }
