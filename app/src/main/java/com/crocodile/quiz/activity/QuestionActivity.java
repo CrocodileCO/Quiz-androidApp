@@ -37,6 +37,8 @@ import com.crocodile.quiz.rest.ServiceGenerator;
 import com.crocodile.quiz.views.QuestionsTrackerView;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import retrofit2.Call;
@@ -118,7 +120,7 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
         ApiClient.getClient().create(ServerInterface.class);
 
 
-        Call<List<Question>> call = apiService.getQuestions(topicId, questionLimit * 2);
+        Call<List<Question>> call = apiService.getAllQuestions(topicId);
 
         call.enqueue(new Callback<List<Question>>() {
             @Override
@@ -186,10 +188,12 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
             Toast.makeText(getApplicationContext(), "No questions", Toast.LENGTH_LONG).show();
             return;
         }
+        Log.d("lol", "Loaded " + loadedQuestions.size() + " questions");
         lastLoadedQuestions = loadedQuestions;
+        Collections.shuffle(lastLoadedQuestions);
         if (loadedQuestions.size() < questionLimit) {questionLimit = loadedQuestions.size();}
 
-        new CheckQuestionsTask(questions).execute(loadedQuestions);
+        new CheckQuestionsTask().execute(lastLoadedQuestions);
 
 
         /*new Thread(new Runnable() {
@@ -212,14 +216,13 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
         } else {
             fillQuestionsFrom(newQuestions);
             Log.d("lol", newQuestions.size() + " new questions");
+            if (questions.size()<questionLimit) {
+                Log.d("lol", "not enough new questions, filling with any");
+                fillQuestionsFrom(lastLoadedQuestions);
+            }
         }
-        if (!(questions.size()<questionLimit)) {
-            Log.d("lol", "enough questions. Starting");
-            startQuiz();
-        } else {
-            Log.d("lol", "loading more");
-            loadQuestions();
-        }
+        Log.d("lol", "enough questions. Starting");
+        startQuiz();
     }
 
     private void fillQuestionsFrom(List<Question> list) {
@@ -396,9 +399,8 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
     public class CheckQuestionsTask extends AsyncTask<List<Question> , Void, List<Question>> {
         DownloadHelper.OnImageDownloadListener listener;
 
-        List<Question> existingQuestions;
 
-        public CheckQuestionsTask( List<Question> existingQuestions) { this.existingQuestions = existingQuestions; }
+        public CheckQuestionsTask() { }
 
         protected List<Question> doInBackground(List<Question>... list) {
             List<Question> newQuestions = new ArrayList<>();
@@ -409,6 +411,7 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
                 if ((q == null) && !alreadyExists(question)) {
                     newQuestions.add(question);
                 }
+                if (newQuestions.size() >= questionLimit) {break;}
             }
             return newQuestions;
         }

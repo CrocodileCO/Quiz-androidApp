@@ -25,6 +25,9 @@ public interface ServerInterface {
     @GET("topics/{topic_id}/rnd")
     Call<List<Question>> getQuestions(@Path("topic_id") String topicId, @Query("limit") int limit);
 
+    @GET("topics/{topic_id}/questions")
+    Call<List<Question>> getAllQuestions(@Path("topic_id") String topicId);
+
     @GET("questions/{questionId}/inc_quantity")
     Call<Void> setStatistics(@Path("questionId") String topicId, @Query("num") int id);
 
