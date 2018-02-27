@@ -59,6 +59,8 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
     //private boolean currentQuestionAnswered;
     private String topicId;
     private boolean statisticSent;
+    private boolean isRunning;
+    private boolean needToInsertQF;
     private int questionLimit;
 
     private RelativeLayout trackerFrame;
@@ -85,12 +87,28 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
         //currentQuestionAnswered = false;
         questionFragments = new ArrayList<>();
         statisticSent = false;
+        needToInsertQF = false;
         questionLimit = 10;
         questions = new ArrayList<>();
 
         insertLoadingFragment();
 
         loadQuestions();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isRunning = true;
+        if (needToInsertQF) {
+            insertQuestionFragment();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        isRunning = false;
     }
 
     public void showNextQuestion() {
@@ -259,7 +277,11 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
             currentImageDownload.setImage(image);
         }
         if (currentImageDownloadIndex == currentQuestionIndex) {
-            insertQuestionFragment();
+            if (isRunning) {
+                insertQuestionFragment();
+            } else {
+                needToInsertQF = true;
+            }
         }
         currentImageDownloadIndex++;
         loadImage(currentImageDownloadIndex);
