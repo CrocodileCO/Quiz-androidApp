@@ -2,6 +2,8 @@ package com.crocodile.quiz.fragment;
 
 
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -11,6 +13,8 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout.LayoutParams;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -42,6 +46,7 @@ public class QuestionFragment extends Fragment {
     ImageView imageView;
     List<Answer> answers;
     RelativeLayout container;
+    View informationButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -54,17 +59,19 @@ public class QuestionFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        button1 =  getActivity().findViewById(R.id.button1);
-        button2 =  getActivity().findViewById(R.id.button2);
-        button3 =  getActivity().findViewById(R.id.button3);
-        button4 =  getActivity().findViewById(R.id.button4);
+        Activity act = getActivity();
+        button1 =  act.findViewById(R.id.button1);
+        button2 =  act.findViewById(R.id.button2);
+        button3 =  act.findViewById(R.id.button3);
+        button4 =  act.findViewById(R.id.button4);
         buttons = new ArrayList<>();
         buttons.add(new ButtonContainer(button1));
         buttons.add(new ButtonContainer(button2));
         buttons.add(new ButtonContainer(button3));
         buttons.add(new ButtonContainer(button4));
-        imageView = getActivity().findViewById(R.id.imageViewQuestion);
-        container = getActivity().findViewById(R.id.containerQuestion);
+        imageView = act.findViewById(R.id.imageViewQuestion);
+        container = act.findViewById(R.id.containerQuestion);
+        informationButton = act.findViewById(R.id.info_button);
 
 
         question = (Question) getArguments().getSerializable("question");
@@ -74,6 +81,18 @@ public class QuestionFragment extends Fragment {
             colorButtons(question.getShuffledPlayerAnswerIndex());
         }
 
+    }
+
+    /*@Override
+    public void onResume() {
+        super.onResume();
+        if ((question.isAnswered()) && (question.getInformation().hasSomethingToShow())) {
+            setupInformationButton();
+        }
+    }*/
+
+    public void hideInformationButton() {
+        informationButton.setVisibility(View.INVISIBLE);
     }
 
     private void setupQuestion() {
@@ -97,6 +116,7 @@ public class QuestionFragment extends Fragment {
                     if (!question.isAnswered()) {
                         question.setPlayerAnswerIndex(index);
                         colorButtons(index);
+                        setupInformationButton();
                         ((QuestionActivity) getActivity()).setQuestionAnswered();
                     } else {
                         for (ButtonContainer button : buttons) {
@@ -117,8 +137,55 @@ public class QuestionFragment extends Fragment {
         }
 
         rightButton.getButton().setBackgroundDrawable(getResources().getDrawable(R.drawable.button_background_true));
+
     }
 
+    private void setupInformationButton() {
+        if (question.getInformation().hasSomethingToShow()) {
+            informationButton.setVisibility(View.VISIBLE);
+            informationButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    showInformation();
+                }
+            });
+        }
+    }
+
+    private void showInformation() {
+        Intent intent = new Intent(getContext(), QuestionAbout.class);
+        intent.putExtra("about", question.getInformation().getText());
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        getContext().startActivity(intent);
+    }
+
+    @Override
+    public Animation onCreateAnimation(int transit, boolean enter, int nextAnim) {
+
+        Animation anim = AnimationUtils.loadAnimation(getActivity(), nextAnim);
+
+        anim.setAnimationListener(new Animation.AnimationListener() {
+
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                if (question.isAnswered()) {
+                    setupInformationButton();
+                }
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+        return anim;
+    }
 
     private class ButtonContainer {
         private Button button;

@@ -16,11 +16,11 @@
             android:id="@+id/tracker_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_toLeftOf="@id/info_button">
+            android:layout_toLeftOf="@id/info_button_placeholder">
 
         </RelativeLayout>
         <ImageView
-            android:id="@+id/info_button"
+            android:id="@+id/info_button_placeholder"
             android:visibility="invisible"
             android:layout_width="40sp"
             android:layout_height="match_parent"
@@ -32,8 +32,7 @@
     <RelativeLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/top_bar_container">
+        android:layout_height="match_parent">
 
     </RelativeLayout>
 

@@ -24,6 +24,9 @@ public class Question implements Serializable{
     @SerializedName("answers")
     @Expose
     private ArrayList<Answer> answers;
+    @SerializedName("information")
+    @Expose
+    private QuestionInformation information;
 
 
     private ArrayList<Answer> shuffledAnswers;
@@ -93,6 +96,14 @@ public class Question implements Serializable{
 
     public void setTopicId(String topicId) {
         this.topicId = topicId;
+    }
+
+    public QuestionInformation getInformation() {
+        return information;
+    }
+
+    public void setInformation(QuestionInformation information) {
+        this.information = information;
     }
 
     public Answer getRightAnswer() { return answers.get(0); }

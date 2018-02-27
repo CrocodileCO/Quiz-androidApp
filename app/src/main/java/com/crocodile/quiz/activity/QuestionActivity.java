@@ -54,7 +54,6 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
 
     private RelativeLayout trackerFrame;
     private QuestionsTrackerView trackerView;
-    private ImageView informationButton;
 
     private GestureDetectorCompat mDetector;
 
@@ -67,7 +66,6 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
 
         mDetector = new GestureDetectorCompat(this, new MyGestureListener());
         trackerFrame = findViewById(R.id.tracker_container);
-        informationButton = findViewById(R.id.info_button);
 
         Intent intent = getIntent();
         String name = intent.getStringExtra("name");
@@ -166,13 +164,7 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
             qst.setup();
         }
 
-        informationButton.setVisibility(View.VISIBLE);
-        informationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showInformation();
-            }
-        });
+
         trackerView = new QuestionsTrackerView(trackerFrame.getContext(), trackerFrame, questions);
         trackerFrame.addView(trackerView);
 
@@ -264,6 +256,12 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
 
     private void slideFragment(Fragment fragment, boolean direction) {
         FragmentManager fragmentManager = getSupportFragmentManager();
+
+        Fragment currentFragment = fragmentManager.findFragmentById(R.id.fragment_container);
+        if ((currentFragment != null) && (currentFragment instanceof QuestionFragment)) {
+            ((QuestionFragment) currentFragment).hideInformationButton();
+        }
+
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         if (direction) {
             fragmentTransaction.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
