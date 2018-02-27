@@ -11,6 +11,7 @@ import android.view.Menu;
 
 import com.crocodile.quiz.R;
 import com.crocodile.quiz.adapter.MenuAdapter;
+import com.crocodile.quiz.database.AppDatabase;
 import com.crocodile.quiz.helper.DownloadHelper;
 import com.crocodile.quiz.model.Topic;
 import com.crocodile.quiz.rest.ApiClient;
@@ -49,6 +50,14 @@ public class MainActivity extends AppCompatActivity implements DownloadHelper.On
 
         loadItems();
 
+        /*new Thread(new Runnable() {
+            @Override
+            public void run() {
+                AppDatabase.getAppDatabase(getApplicationContext()).questionDao().nukeTable();
+                Log.d("lol", "db nuked");
+                Log.d("lol", AppDatabase.getAppDatabase(getApplicationContext()).questionDao().getAll().size() + "");
+            }
+        }).start();*/
     }
 
     private void loadItems() {

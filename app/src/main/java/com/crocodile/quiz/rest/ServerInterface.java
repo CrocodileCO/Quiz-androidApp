@@ -23,7 +23,7 @@ public interface ServerInterface {
     Call<List<Topic>> getTopics();
 
     @GET("topics/{topic_id}/rnd")
-    Call<List<Question>> getQuestions(@Path("topic_id") String topicId);
+    Call<List<Question>> getQuestions(@Path("topic_id") String topicId, @Query("limit") int limit);
 
     @GET("questions/{questionId}/inc_quantity")
     Call<Void> setStatistics(@Path("questionId") String topicId, @Query("num") int id);

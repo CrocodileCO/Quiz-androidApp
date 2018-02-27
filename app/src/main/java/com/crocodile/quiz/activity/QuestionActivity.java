@@ -1,7 +1,9 @@
 package com.crocodile.quiz.activity;
 
+import android.arch.persistence.room.Room;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,6 +20,9 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.crocodile.quiz.R;
+import com.crocodile.quiz.database.AnsweredQuestion;
+import com.crocodile.quiz.database.AnsweredQuestionDao;
+import com.crocodile.quiz.database.AppDatabase;
 import com.crocodile.quiz.fragment.ExitTestDialogFragment;
 import com.crocodile.quiz.fragment.ExitTestResultHandler;
 import com.crocodile.quiz.fragment.LoadingFragment;
@@ -44,6 +49,7 @@ import static com.crocodile.quiz.rest.ApiClient.BASE_URL;
 public class QuestionActivity extends AppCompatActivity implements DownloadHelper.OnImageDownloadListener, ExitTestResultHandler{
 
     private List<Question> questions;
+    private List<Question> lastLoadedQuestions;
     private Question currentQuestion;
     private int currentQuestionIndex;
     private Question currentImageDownload;
@@ -51,6 +57,7 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
     //private boolean currentQuestionAnswered;
     private String topicId;
     private boolean statisticSent;
+    private int questionLimit;
 
     private RelativeLayout trackerFrame;
     private QuestionsTrackerView trackerView;
@@ -58,6 +65,7 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
     private GestureDetectorCompat mDetector;
 
     private List<QuestionFragment> questionFragments;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,11 +83,12 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
         //currentQuestionAnswered = false;
         questionFragments = new ArrayList<>();
         statisticSent = false;
+        questionLimit = 10;
+        questions = new ArrayList<>();
 
         insertLoadingFragment();
 
         loadQuestions();
-
     }
 
     public void showNextQuestion() {
@@ -104,11 +113,12 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
 
 
     private void loadQuestions() {
+
         ServerInterface apiService = ServiceGenerator.createService(ServerInterface.class, BASE_URL);
         ApiClient.getClient().create(ServerInterface.class);
 
 
-        Call<List<Question>> call = apiService.getQuestions(topicId);
+        Call<List<Question>> call = apiService.getQuestions(topicId, questionLimit * 2);
 
         call.enqueue(new Callback<List<Question>>() {
             @Override
@@ -151,21 +161,79 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
                 new SetStatistics().execute(questions);
             }
 
-            //Toast.makeText(getApplicationContext(), "Quiz ended. Right answers: " + countRightAnswers() + "/" + questions.size() + ".", Toast.LENGTH_LONG).show();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    AnsweredQuestionDao dao = AppDatabase.getAppDatabase(getApplicationContext()).questionDao();
+                    for (Question question: questions) {
+                        if (question.isPlayersAnswerRight()) {
+                            AnsweredQuestion q = dao.findById(question.get_id());
+                            if (q == null) {
+                                dao.insertAll(new AnsweredQuestion(question.get_id()));
+                            }
+                        }
+                    }
+                }
+            }).start();
+
         }
     }
 
     private void onQuestionsLoaded(List<Question> loadedQuestions) {
+
         if (loadedQuestions == null) {
             //insertLoadingFragment();
             Toast.makeText(getApplicationContext(), "No questions", Toast.LENGTH_LONG).show();
             return;
         }
-        this.questions = loadedQuestions;
+        lastLoadedQuestions = loadedQuestions;
+        if (loadedQuestions.size() < questionLimit) {questionLimit = loadedQuestions.size();}
+
+        new CheckQuestionsTask(questions).execute(loadedQuestions);
+
+
+        /*new Thread(new Runnable() {
+            @Override
+            public void run() {
+                AppDatabase db = AppDatabase.getAppDatabase(getApplicationContext());
+                db.questionDao().insertAll(new AnsweredQuestion(questions.get(0).get_id()));
+                AnsweredQuestion q = db.questionDao().findById(questions.get(0).get_id());
+                if (q == null) {Log.d("lol", "kek");} else {Log.d("lol", q.getQuestionId());}
+            }
+        }).start();*/
+
+
+    }
+
+    private void onQuestionsChecked(List<Question> newQuestions) {
+        if (newQuestions.size() == 0) {
+            fillQuestionsFrom(lastLoadedQuestions);
+            Log.d("lol","no new questions");
+        } else {
+            fillQuestionsFrom(newQuestions);
+            Log.d("lol", newQuestions.size() + " new questions");
+        }
+        if (!(questions.size()<questionLimit)) {
+            Log.d("lol", "enough questions. Starting");
+            startQuiz();
+        } else {
+            Log.d("lol", "loading more");
+            loadQuestions();
+        }
+    }
+
+    private void fillQuestionsFrom(List<Question> list) {
+        for (int i = 0; (questions.size() < questionLimit) && (i < list.size()); i++) {
+            if (!alreadyExists(list.get(i))) {
+                questions.add(list.get(i));
+            }
+        }
+    }
+
+    private void startQuiz() {
         for (Question qst : questions) {
             qst.setup();
         }
-
 
         trackerView = new QuestionsTrackerView(trackerFrame.getContext(), trackerFrame, questions);
         trackerFrame.addView(trackerView);
@@ -174,15 +242,6 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
         goToQuestion(currentQuestionIndex, true);
         currentImageDownloadIndex = 0;
         loadImage(currentImageDownloadIndex);
-    }
-
-    private void showInformation() {
-        if (isCurrentQuestionAnswered()) {
-            Intent intent = new Intent(getApplicationContext(), QuestionAbout.class);
-            intent.putExtra("about", "hello bob");
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            getApplicationContext().startActivity(intent);
-        }
     }
 
     private void loadImage(int index) {
@@ -320,7 +379,7 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
     @Override
     public void onBackPressed() {
         if (questions != null) {
-            if (currentQuestionIndex < questions.size()) {
+            if ((currentQuestionIndex < questions.size()) && !statisticSent) {
                 ExitTestDialogFragment dialogFragment = new ExitTestDialogFragment();
                 dialogFragment.show(getSupportFragmentManager(), "lol");
                 return;
@@ -332,5 +391,39 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
     @Override
     public void ExitTest() {
         super.onBackPressed();
+    }
+
+    public class CheckQuestionsTask extends AsyncTask<List<Question> , Void, List<Question>> {
+        DownloadHelper.OnImageDownloadListener listener;
+
+        List<Question> existingQuestions;
+
+        public CheckQuestionsTask( List<Question> existingQuestions) { this.existingQuestions = existingQuestions; }
+
+        protected List<Question> doInBackground(List<Question>... list) {
+            List<Question> newQuestions = new ArrayList<>();
+            List<Question> questions = list[0];
+            AnsweredQuestionDao aqd = AppDatabase.getAppDatabase(getApplicationContext()).questionDao();
+            for (Question question: questions) {
+                AnsweredQuestion q = aqd.findById(question.get_id());
+                if ((q == null) && !alreadyExists(question)) {
+                    newQuestions.add(question);
+                }
+            }
+            return newQuestions;
+        }
+
+        protected void onPostExecute(List<Question> result) {
+            onQuestionsChecked(result);
+        }
+    }
+
+    private boolean alreadyExists(Question question) {
+        for (Question q: questions) {
+            if (q.get_id().equals(question.get_id())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
