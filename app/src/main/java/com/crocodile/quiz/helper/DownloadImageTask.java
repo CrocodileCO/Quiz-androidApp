@@ -24,5 +24,9 @@ public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         return mIcon11;
     }
 
-    protected void onPostExecute(Bitmap result) {listener.onImageDownloaded(result);}
+    protected void onPostExecute(Bitmap result) {
+        if (listener != null) {
+            listener.onImageDownloaded(result);
+        }
+    }
 }

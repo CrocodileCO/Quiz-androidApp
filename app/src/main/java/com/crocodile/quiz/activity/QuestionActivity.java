@@ -114,7 +114,9 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
             @Override
             public void onResponse(Call<List<Question>> call, Response<List<Question>> response) {
                 int statusCode = response.code();
-                onQuestionsLoaded(response.body());
+                if (this != null) {
+                    onQuestionsLoaded(response.body());
+                }
             }
 
             @Override
