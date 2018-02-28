@@ -3,17 +3,16 @@ package com.crocodile.quiz.activity;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 
 import com.crocodile.quiz.R;
-import com.crocodile.quiz.adapter.MenuAdapter;
-import com.crocodile.quiz.database.AppDatabase;
+import com.crocodile.quiz.adapter.GroupAdapter;
 import com.crocodile.quiz.helper.DownloadHelper;
-import com.crocodile.quiz.model.Topic;
+import com.crocodile.quiz.model.Group;
 import com.crocodile.quiz.rest.ApiClient;
 import com.crocodile.quiz.rest.ServerInterface;
 import com.crocodile.quiz.rest.ServiceGenerator;
@@ -45,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements DownloadHelper.On
 
         mRecyclerView.setHasFixedSize(true);
 
-        mLayoutManager = new GridLayoutManager(this,3);
+        mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         loadItems();
@@ -66,21 +65,21 @@ public class MainActivity extends AppCompatActivity implements DownloadHelper.On
         ApiClient.getClient().create(ServerInterface.class);
 
 
-        Call<List<Topic>> call = apiService.getTopics();
+        Call<List<Group>> call = apiService.getGroups();
 
-        call.enqueue(new Callback<List<Topic>>() {
+        call.enqueue(new Callback<List<Group>>() {
             @Override
-            public void onResponse(Call<List<Topic>> call, Response<List<Topic>> response) {
+            public void onResponse(Call<List<Group>> call, Response<List<Group>> response) {
                 int statusCode = response.code();
 
-                List<Topic> topics = response.body();
-
-                mRecyclerView.setAdapter(new MenuAdapter(topics, R.layout.menu_item, getApplicationContext()));
+                List<Group> groups =response.body();
+                //List<Topic> topics = response.body();
+                mRecyclerView.setAdapter(new GroupAdapter(groups, R.layout.group_fragment, getApplicationContext()));
 
             }
 
             @Override
-            public void onFailure(Call<List<Topic>> call, Throwable t) {
+            public void onFailure(Call<List<Group>> call, Throwable t) {
                 Log.e("lol", t.toString());
 
             }

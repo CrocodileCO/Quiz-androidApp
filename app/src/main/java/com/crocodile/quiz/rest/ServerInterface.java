@@ -1,6 +1,7 @@
 package com.crocodile.quiz.rest;
 
 
+import com.crocodile.quiz.model.Group;
 import com.crocodile.quiz.model.Question;
 import com.crocodile.quiz.model.Topic;
 
@@ -20,7 +21,9 @@ public interface ServerInterface {
     Call<List<Question>> getQuestions();*/
 
     @GET("topics")
-    Call<List<Topic>> getTopics();
+    Call<List<Topic>> getTopics();   
+    @GET("groups")
+    Call<List<Group>> getGroups();
 
     @GET("topics/{topic_id}/rnd")
     Call<List<Question>> getQuestions(@Path("topic_id") String topicId, @Query("limit") int limit);

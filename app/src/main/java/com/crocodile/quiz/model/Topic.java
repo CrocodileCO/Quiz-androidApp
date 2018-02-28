@@ -11,6 +11,8 @@ public class Topic {
     private String title;
     @SerializedName("imageUrl")
     private String imageUrl;
+    @SerializedName("groupId")
+    private String groupId;
 
     public Topic() {
     }
@@ -53,5 +55,12 @@ public class Topic {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 }
