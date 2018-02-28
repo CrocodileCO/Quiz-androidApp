@@ -11,15 +11,18 @@
             android:id="@+id/group_text_view"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:background="@color/colorAccent"
+            android:background="@color/colorPrimaryDark"
             android:gravity="center_vertical"
-            android:textSize="20dp"/>
+            android:textSize="20dp"
+            android:textColor="@color/colorTopicText"
+            android:paddingLeft="5dp"/>
 
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/group_text_view"
-        android:layout_marginHorizontal="14dp">
+        android:layout_marginHorizontal="10dp"
+        android:fadeScrollbars="false">
         <android.support.v7.widget.RecyclerView
             android:id="@+id/topics_recycler"
             android:layout_width="wrap_content"
