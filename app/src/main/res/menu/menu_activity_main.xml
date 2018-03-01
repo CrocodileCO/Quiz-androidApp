@@ -3,9 +3,10 @@
     xmlns:yourapp="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/app_name_item"
-        android:title="Hello"
+        android:icon="@drawable/user"
         yourapp:showAsAction="always"
-        android:gravity="end"/>
+        android:title="" />
+
 
 
 </menu>

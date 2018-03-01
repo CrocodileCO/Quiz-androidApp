@@ -10,9 +10,10 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="10dp"
-    card_view:cardBackgroundColor="@color/windowBackground"
+    card_view:cardBackgroundColor="@color/cardBackground"
     card_view:cardCornerRadius="4dp"
-    android:layout_marginBottom="10dp">
+    android:layout_marginBottom="10dp"
+    android:elevation="10dp">
         <RelativeLayout
         android:id="@+id/group_relative_layout"
         android:layout_width="match_parent"
@@ -31,7 +32,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/group_text_view"
-                android:layout_marginHorizontal="10dp"
                 android:fadeScrollbars="false">
                 <android.support.v7.widget.RecyclerView
                     android:id="@+id/topics_recycler"

@@ -14,6 +14,7 @@
         <include layout="@layout/toolbar" />
 
         <android.support.v7.widget.RecyclerView
+            android:layout_marginTop="10dp"
             android:layout_below="@+id/toolbar_actionbar"
             android:id="@+id/my_recycler_view"
             android:scrollbars="vertical"
