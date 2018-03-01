@@ -1,32 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-    <RelativeLayout
+
+
+<android.support.v7.widget.CardView
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/card_view"
+    android:layout_gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="10dp"
+    card_view:cardBackgroundColor="@color/windowBackground"
+    card_view:cardCornerRadius="4dp"
+    android:layout_marginBottom="10dp">
+        <RelativeLayout
         android:id="@+id/group_relative_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        xmlns:android="http://schemas.android.com/apk/res/android"
         android:paddingBottom="10dp">
+            <TextView
+                android:id="@+id/group_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:gravity="center_vertical"
+                android:textSize="20dp"
+                android:textColor="@color/colorTopicText"
+                android:paddingLeft="5dp"/>
 
-        <TextView
-            android:id="@+id/group_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:background="@color/colorPrimaryDark"
-            android:gravity="center_vertical"
-            android:textSize="20dp"
-            android:textColor="@color/colorTopicText"
-            android:paddingLeft="5dp"/>
-
-    <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/group_text_view"
-        android:layout_marginHorizontal="10dp"
-        android:fadeScrollbars="false">
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/topics_recycler"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:scrollbars="vertical" />
-    </HorizontalScrollView>
-    </RelativeLayout>
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/group_text_view"
+                android:layout_marginHorizontal="10dp"
+                android:fadeScrollbars="false">
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/topics_recycler"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="vertical" />
+            </HorizontalScrollView>
+     </RelativeLayout>
+</android.support.v7.widget.CardView>
