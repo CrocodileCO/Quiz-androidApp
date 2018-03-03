@@ -74,6 +74,7 @@ public class QuestionFragment extends Fragment {
         setupQuestion();
         if (question.isAnswered()) {
             colorButtons(question.getShuffledPlayerAnswerIndex());
+            setupInformationButton();
         }
 
     }
@@ -157,7 +158,7 @@ public class QuestionFragment extends Fragment {
         getContext().startActivity(intent);
     }
 
-    @Override
+    /*@Override
     public Animation onCreateAnimation(int transit, boolean enter, int nextAnim) {
 
         Animation anim = AnimationUtils.loadAnimation(getActivity(), nextAnim);
@@ -172,8 +173,8 @@ public class QuestionFragment extends Fragment {
             @Override
             public void onAnimationEnd(Animation animation) {
                 if (question.isAnswered()) {
-                   // setupInformationButton();
-                    Log.d("qqqqq",""+question.isAnswered());
+                    setupInformationButton();
+                    Log.d("qqqqq",""+question.isAnswered()+question.getAnswers().get(0).getText());
 
                 }
             }
@@ -185,7 +186,7 @@ public class QuestionFragment extends Fragment {
         });
 
         return anim;
-    }
+    }*/
 
     private class ButtonContainer {
         private Button button;
