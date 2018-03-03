@@ -12,6 +12,9 @@
         android:id="@+id/top_bar_container"
         android:layout_width="match_parent"
         android:layout_height="40sp">
+
+
+
         <RelativeLayout
             android:id="@+id/tracker_container"
             android:layout_width="match_parent"
@@ -34,6 +37,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginEnd="41dp"
+            android:layout_marginTop="68dp"
+            android:src="@drawable/info"
+            android:visibility="invisible"/>
     </RelativeLayout>
 
 </RelativeLayout>

@@ -1,29 +1,21 @@
 package com.crocodile.quiz.fragment;
 
 
-
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.view.Gravity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.FrameLayout.LayoutParams;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-
-import android.widget.TextSwitcher;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.ViewSwitcher;
 
 import com.crocodile.quiz.R;
 import com.crocodile.quiz.activity.QuestionAbout;
@@ -46,7 +38,8 @@ public class QuestionFragment extends Fragment {
     ImageView imageView;
     List<Answer> answers;
     RelativeLayout container;
-    View informationButton;
+   // View informationButton;
+    FloatingActionButton informationButton ;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -71,7 +64,9 @@ public class QuestionFragment extends Fragment {
         buttons.add(new ButtonContainer(button4));
         imageView = act.findViewById(R.id.imageViewQuestion);
         container = act.findViewById(R.id.containerQuestion);
-        informationButton = act.findViewById(R.id.info_button);
+        //informationButton = act.findViewById(R.id.info_button);
+        informationButton = (FloatingActionButton) act.findViewById(R.id.fab);
+        informationButton.hide();
 
 
         question = (Question) getArguments().getSerializable("question");
@@ -93,6 +88,7 @@ public class QuestionFragment extends Fragment {
 
     public void hideInformationButton() {
         informationButton.setVisibility(View.INVISIBLE);
+       // informationButton.hide();
     }
 
     private void setupQuestion() {
@@ -116,7 +112,8 @@ public class QuestionFragment extends Fragment {
                     if (!question.isAnswered()) {
                         question.setPlayerAnswerIndex(index);
                         colorButtons(index);
-                        setupInformationButton();
+                       setupInformationButton(); //why it here ?
+
                         ((QuestionActivity) getActivity()).setQuestionAnswered();
                     } else {
                         for (ButtonContainer button : buttons) {
@@ -142,7 +139,8 @@ public class QuestionFragment extends Fragment {
 
     private void setupInformationButton() {
         if (question.getInformation().hasSomethingToShow()) {
-            informationButton.setVisibility(View.VISIBLE);
+            //informationButton.setVisibility(View.VISIBLE);
+            informationButton.show();
             informationButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -174,7 +172,9 @@ public class QuestionFragment extends Fragment {
             @Override
             public void onAnimationEnd(Animation animation) {
                 if (question.isAnswered()) {
-                    setupInformationButton();
+                   // setupInformationButton();
+                    Log.d("qqqqq",""+question.isAnswered());
+
                 }
             }
 
