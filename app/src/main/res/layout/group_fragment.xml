@@ -13,7 +13,7 @@
     card_view:cardBackgroundColor="@color/cardBackground"
     card_view:cardCornerRadius="4dp"
     android:layout_marginBottom="10dp"
-    android:elevation="10dp">
+    android:elevation="4dp">
         <RelativeLayout
         android:id="@+id/group_relative_layout"
         android:layout_width="match_parent"
@@ -39,7 +39,8 @@
                     android:id="@+id/topics_recycler"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:scrollbars="vertical" />
+                    android:scrollbars="vertical"
+                    android:elevation="8dp"/>
             </HorizontalScrollView>
      </RelativeLayout>
 </android.support.v7.widget.CardView>

@@ -1,3 +1,4 @@
+//noinspection GradleCompatible
 apply plugin: 'com.android.application'
 
 android {
@@ -23,6 +24,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.2.+'
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.squareup.retrofit2:converter-gson:2.0.2'
+    compile 'com.android.support:support-v13:26.+'
 
     compile 'com.squareup.okhttp3:okhttp-urlconnection:3.2.0'
     compile 'com.squareup.okhttp3:logging-interceptor:3.3.1'
@@ -35,9 +37,8 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
     compile 'com.android.support:recyclerview-v7:26.+'
-    compile 'com.android.support:cardview-v7:21.0.+'
-
-   // implementation 'com.github.chrisbanes:PhotoView:latest.release.here'
+    compile 'com.android.support:cardview-v7:26.+'
+    compile 'com.android.support:design:26.+'
 
     implementation "android.arch.persistence.room:runtime:1.0.0"
     annotationProcessor "android.arch.persistence.room:compiler:1.0.0"
