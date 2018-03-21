@@ -4,9 +4,9 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.crocodile.quiz.model.Question;
-import com.crocodile.quiz.rest.ApiClient;
-import com.crocodile.quiz.rest.ServerInterface;
-import com.crocodile.quiz.rest.ServiceGenerator;
+import com.crocodile.quiz.network.rest.ApiClient;
+import com.crocodile.quiz.network.rest.ServerInterface;
+import com.crocodile.quiz.network.rest.ServiceGenerator;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static com.crocodile.quiz.rest.ApiClient.BASE_URL;
+import static com.crocodile.quiz.network.rest.ApiClient.BASE_URL;
 
 
 public class SetStatistics extends AsyncTask<List<Question>,Void,Void>{
