@@ -70,6 +70,7 @@ public class QuestionFragment extends Fragment {
         buttons.add(new ButtonContainer(button3));
         buttons.add(new ButtonContainer(button4));
         imageView = act.findViewById(R.id.imageViewQuestion);
+
         container = act.findViewById(R.id.containerQuestion);
         informationButton = act.findViewById(R.id.info_button);
 

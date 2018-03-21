@@ -3,10 +3,10 @@
     <color name="colorPrimary">#000000</color>
     <color name="colorPrimaryDark">#2f4f4f</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="windowBackground">#303030</color>
-    <color name="cardBackground">#524E4E</color>
+    <color name="windowBackground">#D4D4D4</color>
+    <color name="cardBackground">#FFFFFF</color>
     <color name="colorRightAnswer">#008000</color>
     <color name="colorWrongAnswer">#8B0000</color>
     <color name="colorYellow">#FEFE22</color>
-    <color name="colorTopicText">#ffffff</color>
+    <color name="colorTopicText">#000000</color>
 </resources>

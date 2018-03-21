@@ -1,5 +1,6 @@
 package com.crocodile.quiz.activity;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -7,8 +8,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.crocodile.quiz.R;
 import com.crocodile.quiz.adapter.GroupAdapter;
@@ -38,7 +44,12 @@ public class MainActivity extends AppCompatActivity implements DownloadHelper.On
         setContentView(R.layout.activity_main);
 
         Toolbar mActionBarToolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
+        //mActionBarToolbar.setLogo(R.drawable.egg1_TwR_icon);
         setSupportActionBar(mActionBarToolbar);
+        setTitle("EGG DANCE");
+
+
+
 
         mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
 
@@ -97,5 +108,28 @@ public class MainActivity extends AppCompatActivity implements DownloadHelper.On
     @Override
     public void onImageDownloaded(Bitmap image) {
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_item_user:
+                // User chose the "Settings" item, show the app settings UI...
+
+                Log.d("sdsd","user");
+                return true;
+
+
+            case R.id.menu_item_settings:
+                Intent intent = new Intent(this, Settings.class);
+                this.startActivity(intent);
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+
+        }
     }
 }

@@ -22,11 +22,13 @@
             <TextView
                 android:id="@+id/group_text_view"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="36dp"
                 android:gravity="center_vertical"
                 android:textSize="20dp"
                 android:textColor="@color/colorTopicText"
-                android:paddingLeft="5dp"/>
+                android:fontFamily="@font/lora"
+                android:paddingLeft="10dp"
+                android:textStyle="bold"/>
 
             <HorizontalScrollView
                 android:layout_width="match_parent"
