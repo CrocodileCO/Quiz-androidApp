@@ -6,12 +6,12 @@
         android:icon="@drawable/user"
         yourapp:showAsAction="always"
         android:title="" />
-    <item
+    <!--<item-->
 
-        android:id="@+id/menu_item_settings"
-        android:icon="@drawable/settings"
-        yourapp:showAsAction="always"
-        android:title="asdasd" />
+        <!--android:id="@+id/menu_item_settings"-->
+        <!--android:icon="@drawable/settings"-->
+        <!--yourapp:showAsAction="never"-->
+        <!--android:title="Settings" />-->
 
 
 

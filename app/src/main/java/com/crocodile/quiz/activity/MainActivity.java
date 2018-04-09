@@ -2,6 +2,7 @@ package com.crocodile.quiz.activity;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -41,12 +42,24 @@ public class MainActivity extends AppCompatActivity implements DownloadHelper.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
+        setTitle("");
 
         Toolbar mActionBarToolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
+
         //mActionBarToolbar.setLogo(R.drawable.egg1_TwR_icon);
+
+        TextView tx = (TextView) mActionBarToolbar.findViewById(R.id.tv_toolbar_title);
+
+        Typeface custom_font = Typeface.createFromAsset(getAssets(),  "fonts/ZillaSlab-SemiBold.ttf");
+
+        tx.setTypeface(custom_font);
+
+       // myTitleText.setText("EGG DAMCE");
         setSupportActionBar(mActionBarToolbar);
-        setTitle("EGG DANCE");
+
+
 
 
 
@@ -115,15 +128,13 @@ public class MainActivity extends AppCompatActivity implements DownloadHelper.On
         switch (item.getItemId()) {
             case R.id.menu_item_user:
                 // User chose the "Settings" item, show the app settings UI...
-
-                Log.d("sdsd","user");
                 return true;
 
 
-            case R.id.menu_item_settings:
-                Intent intent = new Intent(this, Settings.class);
-                this.startActivity(intent);
-                return true;
+//            case R.id.menu_item_settings:
+//                Intent intent = new Intent(this, Settings.class);
+//                this.startActivity(intent);
+//                return true;
 
             default:
                 // If we got here, the user's action was not recognized.
