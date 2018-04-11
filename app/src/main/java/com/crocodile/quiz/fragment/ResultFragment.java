@@ -19,6 +19,7 @@ import com.crocodile.quiz.activity.QuestionActivity;
 public class ResultFragment extends Fragment {
 
     private Button backButton;
+    private Button restartButton;
     private TextView resultTextView;
     private ClipDrawable mImageDrawable;
     private ImageView imageView;
@@ -41,6 +42,7 @@ public class ResultFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         backButton = getActivity().findViewById(R.id.button_result_back);
+        restartButton = getActivity().findViewById(R.id.button_try_again);
         resultTextView = getActivity().findViewById(R.id.result_text_view);
         imageView = getActivity().findViewById(R.id.result_image_inside);
 
@@ -66,6 +68,12 @@ public class ResultFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 ((QuestionActivity)getActivity()).ExitTest();
+            }
+        });
+        restartButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((QuestionActivity)getActivity()).startGame();
             }
         });
     }

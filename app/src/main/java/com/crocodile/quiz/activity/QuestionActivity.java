@@ -84,6 +84,11 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
         setTitle(name);
         topicId = intent.getStringExtra("id");
 
+        startGame();
+    }
+
+    public void startGame(){
+        trackerFrame.removeAllViews();
         //currentQuestionAnswered = false;
         questionFragments = new ArrayList<>();
         statisticSent = false;
@@ -255,7 +260,6 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
         for (Question qst : questions) {
             qst.setup();
         }
-
         trackerView = new QuestionsTrackerView(trackerFrame.getContext(), trackerFrame, questions);
         trackerFrame.addView(trackerView);
 
