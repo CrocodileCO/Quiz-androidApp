@@ -54,15 +54,6 @@ public class MainActivity extends AppCompatActivity implements MainPresenter.Vie
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         init();
-
-        /*new Thread(new Runnable() {
-            @Override
-            public void run() {
-                AppDatabase.getAppDatabase(getApplicationContext()).questionDao().nukeTable();
-                Log.d("lol", "db nuked");
-                Log.d("lol", AppDatabase.getAppDatabase(getApplicationContext()).questionDao().getAll().size() + "");
-            }
-        }).start();*/
     }
 
     private void init() {

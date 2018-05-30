@@ -1,8 +1,6 @@
 package com.crocodile.quiz.presentation.ui.activities;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,61 +8,38 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.crocodile.quiz.R;
-import com.crocodile.quiz.storage.database.AnsweredQuestion;
-import com.crocodile.quiz.storage.database.AnsweredQuestionDao;
-import com.crocodile.quiz.storage.database.AppDatabase;
+import com.crocodile.quiz.domain.executor.impl.ThreadExecutor;
+import com.crocodile.quiz.domain.repository.Impl.QuestionsRepositoryImpl;
+import com.crocodile.quiz.presentation.presenters.QuestionPresenter;
+import com.crocodile.quiz.presentation.presenters.impl.QuestionPresenterImpl;
 import com.crocodile.quiz.presentation.ui.fragments.ExitTestDialogFragment;
 import com.crocodile.quiz.presentation.ui.fragments.ExitTestResultHandler;
 import com.crocodile.quiz.presentation.ui.fragments.LoadingFragment;
 import com.crocodile.quiz.presentation.ui.fragments.QuestionFragment;
 import com.crocodile.quiz.presentation.ui.fragments.ResultFragment;
-import com.crocodile.quiz.helper.DownloadHelper;
-import com.crocodile.quiz.helper.SetStatistics;
 import com.crocodile.quiz.model.Question;
-import com.crocodile.quiz.network.rest.ApiClient;
-import com.crocodile.quiz.network.rest.ServerInterface;
-import com.crocodile.quiz.network.rest.ServiceGenerator;
 import com.crocodile.quiz.presentation.ui.customviews.QuestionsTrackerView;
+import com.crocodile.quiz.threading.MainThreadImpl;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
-import static com.crocodile.quiz.network.rest.ApiClient.BASE_URL;
+public class QuestionActivity extends AppCompatActivity implements ExitTestResultHandler, QuestionPresenter.View{
 
 
-public class QuestionActivity extends AppCompatActivity implements DownloadHelper.OnImageDownloadListener, ExitTestResultHandler{
-
-    private List<Question> questions;
-    private List<Question> lastLoadedQuestions;
-    private Question currentQuestion;
-    private int currentQuestionIndex;
-    private Question currentImageDownload;
-    private int currentImageDownloadIndex;
-    //private boolean currentQuestionAnswered;
     private String topicId;
-    private boolean statisticSent;
-    private boolean isRunning;
-    private boolean needToInsertQF;
-    private int questionLimit;
 
     private RelativeLayout trackerFrame;
     private QuestionsTrackerView trackerView;
 
     private GestureDetectorCompat mDetector;
 
-    private List<QuestionFragment> questionFragments;
+    private QuestionPresenter mPresenter;
 
 
     @Override
@@ -80,207 +55,36 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
         setTitle(name);
         topicId = intent.getStringExtra("id");
 
-        //currentQuestionAnswered = false;
-        questionFragments = new ArrayList<>();
-        statisticSent = false;
-        needToInsertQF = false;
-        questionLimit = 10;
-        questions = new ArrayList<>();
-
         insertLoadingFragment();
 
-        loadQuestions();
+        init();
+    }
+
+    protected  void init() {
+        mPresenter = new QuestionPresenterImpl(
+                ThreadExecutor.getInstance(),
+                MainThreadImpl.getInstance(),
+                this,
+                new QuestionsRepositoryImpl(this),
+                getApplicationContext());
+        mPresenter.loadQuestions(topicId);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        isRunning = true;
-        if (needToInsertQF) {
-            insertQuestionFragment();
-        }
+        mPresenter.resume();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        isRunning = false;
+        mPresenter.pause();
     }
 
-    public void showNextQuestion() {
-        //slideLoadingFragment();
-        //currentQuestionAnswered = false;
-        currentQuestionIndex++;
-        goToQuestion(currentQuestionIndex, true);
-    }
-
-    public void showPreviousQuestion() {
-        if (currentQuestionIndex > 0) {
-            currentQuestionIndex--;
-            goToQuestion(currentQuestionIndex, false);
-        }
-    }
-
-
-    public void setQuestionAnswered() {
-        //currentQuestionAnswered = true;
+    public void setQuestionAnswered(Question question, int index) {
+        mPresenter.onQuestionAnswered(question, index);
         trackerView.postInvalidate();
-    }
-
-
-    private void loadQuestions() {
-
-        ServerInterface apiService = ServiceGenerator.createService(ServerInterface.class, BASE_URL);
-        ApiClient.getClient().create(ServerInterface.class);
-
-
-        Call<List<Question>> call = apiService.getAllQuestions(topicId);
-
-        call.enqueue(new Callback<List<Question>>() {
-            @Override
-            public void onResponse(Call<List<Question>> call, Response<List<Question>> response) {
-                int statusCode = response.code();
-                if (this != null) {
-                    onQuestionsLoaded(response.body());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Question>> call, Throwable t) {
-                Log.e("lol", t.toString());
-            }
-        });
-
-    }
-
-    private void goToQuestion(int index, boolean direction) {
-        trackerView.setCurrentQuestion(index);
-        trackerView.postInvalidate();
-        if (index < questions.size()) {
-            currentQuestion = questions.get(index);
-            //currentQuestion.setup();
-
-            if(currentQuestion.getImage() == null) {
-                if (currentQuestionIndex != 0) {
-                    slideLoadingFragment();
-                }
-            } else {
-                slideQuestionFragment(direction);
-            }
-
-            //DownloadHelper.downloadImage(currentQuestion.getImageUrl(), this);
-        } else {
-            slideResultFragment();
-
-            if (!statisticSent) {
-                statisticSent = true;
-                new SetStatistics().execute(questions);
-            }
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    AnsweredQuestionDao dao = AppDatabase.getAppDatabase(getApplicationContext()).questionDao();
-                    for (Question question: questions) {
-                        if (question.isPlayersAnswerRight()) {
-                            AnsweredQuestion q = dao.findById(question.get_id());
-                            if (q == null) {
-                                dao.insertAll(new AnsweredQuestion(question.get_id()));
-                            }
-                        }
-                    }
-                }
-            }).start();
-
-        }
-    }
-
-    private void onQuestionsLoaded(List<Question> loadedQuestions) {
-
-        if (loadedQuestions == null) {
-            //insertLoadingFragment();
-            Toast.makeText(getApplicationContext(), "No questions", Toast.LENGTH_LONG).show();
-            return;
-        }
-        Log.d("lol", "Loaded " + loadedQuestions.size() + " questions");
-        lastLoadedQuestions = loadedQuestions;
-        Collections.shuffle(lastLoadedQuestions);
-        if (loadedQuestions.size() < questionLimit) {questionLimit = loadedQuestions.size();}
-
-        new CheckQuestionsTask().execute(lastLoadedQuestions);
-
-
-        /*new Thread(new Runnable() {
-            @Override
-            public void run() {
-                AppDatabase db = AppDatabase.getAppDatabase(getApplicationContext());
-                db.questionDao().insertAll(new AnsweredQuestion(questions.get(0).get_id()));
-                AnsweredQuestion q = db.questionDao().findById(questions.get(0).get_id());
-                if (q == null) {Log.d("lol", "kek");} else {Log.d("lol", q.getQuestionId());}
-            }
-        }).start();*/
-
-
-    }
-
-    private void onQuestionsChecked(List<Question> newQuestions) {
-        if (newQuestions.size() == 0) {
-            fillQuestionsFrom(lastLoadedQuestions);
-            Log.d("lol","no new questions");
-        } else {
-            fillQuestionsFrom(newQuestions);
-            Log.d("lol", newQuestions.size() + " new questions");
-            if (questions.size()<questionLimit) {
-                Log.d("lol", "not enough new questions, filling with any");
-                fillQuestionsFrom(lastLoadedQuestions);
-            }
-        }
-        Log.d("lol", "enough questions. Starting");
-        startQuiz();
-    }
-
-    private void fillQuestionsFrom(List<Question> list) {
-        for (int i = 0; (questions.size() < questionLimit) && (i < list.size()); i++) {
-            if (!alreadyExists(list.get(i))) {
-                questions.add(list.get(i));
-            }
-        }
-    }
-
-    private void startQuiz() {
-        for (Question qst : questions) {
-            qst.setup();
-        }
-
-        trackerView = new QuestionsTrackerView(trackerFrame.getContext(), trackerFrame, questions);
-        trackerFrame.addView(trackerView);
-
-        currentQuestionIndex = 0;
-        goToQuestion(currentQuestionIndex, true);
-        currentImageDownloadIndex = 0;
-        loadImage(currentImageDownloadIndex);
-    }
-
-    private void loadImage(int index) {
-        if (index < questions.size()) {
-            currentImageDownload = questions.get(index);
-            DownloadHelper.downloadImage(currentImageDownload.getImageUrl(), this);
-        }
-    }
-
-    public void onImageDownloaded(Bitmap image) {
-        if (image != null) {
-            currentImageDownload.setImage(image);
-        }
-        if (currentImageDownloadIndex == currentQuestionIndex) {
-            if (isRunning) {
-                insertQuestionFragment();
-            } else {
-                needToInsertQF = true;
-            }
-        }
-        currentImageDownloadIndex++;
-        loadImage(currentImageDownloadIndex);
     }
 
     private void insertLoadingFragment() {
@@ -291,16 +95,16 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
         slideFragment(new LoadingFragment(), true);
     }
 
-    private void insertQuestionFragment() {
-        insertFragment(getQuestionFragment(currentQuestion));
+    private void insertQuestionFragment(Question question) {
+        insertFragment(getQuestionFragment(question));
     }
 
-    private void slideQuestionFragment(boolean direction) {
-        slideFragment(getQuestionFragment(currentQuestion), direction);
+    private void slideQuestionFragment(boolean direction, Question question) {
+        slideFragment(getQuestionFragment(question), direction);
     }
 
-    private void slideResultFragment() {
-        slideFragment(getResultFragment(countRightAnswers(), questions.size()), true);
+    private void slideResultFragment(int rightAnswers, int totalAnswers) {
+        slideFragment(getResultFragment(rightAnswers, totalAnswers), true);
     }
 
     private ResultFragment getResultFragment(int rightAnswers, int totalAnswers) {
@@ -313,17 +117,10 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
     }
 
     private QuestionFragment getQuestionFragment(Question question) {
-        int index = questions.indexOf(question);
-        QuestionFragment questionFragment;
-        if (index < questionFragments.size()) {
-            questionFragment = questionFragments.get(index);
-        } else {
-            questionFragment = new QuestionFragment();
-            Bundle bundle = new Bundle();
-            bundle.putSerializable("question", question);
-            questionFragment.setArguments(bundle);
-            questionFragments.add(questionFragment);
-        }
+        QuestionFragment questionFragment = new QuestionFragment();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("question", question);
+        questionFragment.setArguments(bundle);
         return questionFragment;
     }
 
@@ -354,18 +151,63 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
         fragmentTransaction.commit();
     }
 
-    private int countRightAnswers() {
-        int result = 0;
-        for (Question question: questions) {
-            result += question.isPlayersAnswerRight() ? 1 : 0;
-        }
-        return result;
-    }
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         this.mDetector.onTouchEvent(event);
         return super.onTouchEvent(event);
+    }
+
+    @Override
+    public void showResults(int right, int total, int index) {
+        updateTracker(index);
+        slideResultFragment(right, total);
+    }
+
+    @Override
+    public void slideQuestion(Question question, int index, boolean direction) {
+        updateTracker(index);
+        slideQuestionFragment(direction, question);
+    }
+
+    @Override
+    public void insertQuestion(Question question, int index) {
+        updateTracker(index);
+        insertQuestionFragment(question);
+    }
+
+    private void updateTracker(int index) {
+        trackerView.setCurrentQuestion(index);
+        trackerView.postInvalidate();
+    }
+
+    @Override
+    public void showLoading(boolean slide) {
+        if(slide) {
+            slideLoadingFragment();
+        } else {
+            insertLoadingFragment();
+        }
+    }
+
+    @Override
+    public void onQuestionsLoaded(List<Question> questions) {
+        trackerView = new QuestionsTrackerView(trackerFrame.getContext(), trackerFrame, questions);
+        trackerFrame.addView(trackerView);
+    }
+
+    @Override
+    public void showProgress() {
+
+    }
+
+    @Override
+    public void hideProgress() {
+
+    }
+
+    @Override
+    public void showError(String message) {
+
     }
 
     class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
@@ -381,11 +223,9 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
                                float velocityX, float velocityY) {
             if ((Math.abs(velocityX) > Math.abs(velocityY))) {
                 if (velocityX < 0) {
-                    if ((isCurrentQuestionAnswered()) && (currentQuestionIndex < questions.size())){
-                        showNextQuestion();
-                    }
+                    mPresenter.goToNext();
                 } else {
-                        showPreviousQuestion();
+                    mPresenter.goToPrevious();
                 }
             }
 
@@ -393,20 +233,10 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
         }
     }
 
-    private boolean isCurrentQuestionAnswered() {
-        return ((currentQuestion != null) && (currentQuestion.isAnswered()));
-    }
-
     @Override
     public void onBackPressed() {
-        if (questions != null) {
-            if ((currentQuestionIndex < questions.size()) && !statisticSent) {
-                ExitTestDialogFragment dialogFragment = new ExitTestDialogFragment();
-                dialogFragment.show(getSupportFragmentManager(), "lol");
-                return;
-            }
-        }
-        ExitTest();
+        ExitTestDialogFragment dialogFragment = new ExitTestDialogFragment();
+        dialogFragment.show(getSupportFragmentManager(), "lol");
     }
 
     @Override
@@ -414,37 +244,4 @@ public class QuestionActivity extends AppCompatActivity implements DownloadHelpe
         super.onBackPressed();
     }
 
-    public class CheckQuestionsTask extends AsyncTask<List<Question> , Void, List<Question>> {
-        DownloadHelper.OnImageDownloadListener listener;
-
-
-        public CheckQuestionsTask() { }
-
-        protected List<Question> doInBackground(List<Question>... list) {
-            List<Question> newQuestions = new ArrayList<>();
-            List<Question> questions = list[0];
-            AnsweredQuestionDao aqd = AppDatabase.getAppDatabase(getApplicationContext()).questionDao();
-            for (Question question: questions) {
-                AnsweredQuestion q = aqd.findById(question.get_id());
-                if ((q == null) && !alreadyExists(question)) {
-                    newQuestions.add(question);
-                }
-                if (newQuestions.size() >= questionLimit) {break;}
-            }
-            return newQuestions;
-        }
-
-        protected void onPostExecute(List<Question> result) {
-            onQuestionsChecked(result);
-        }
-    }
-
-    private boolean alreadyExists(Question question) {
-        for (Question q: questions) {
-            if (q.get_id().equals(question.get_id())) {
-                return true;
-            }
-        }
-        return false;
-    }
 }

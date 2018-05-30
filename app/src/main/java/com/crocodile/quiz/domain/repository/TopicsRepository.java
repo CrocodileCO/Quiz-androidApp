@@ -11,5 +11,5 @@ public interface TopicsRepository {
         void onTopicsLoaded(List<Group> groups);
     }
 
-    public void getTopics(Callback callback);
+    void getTopics(Callback callback);
 }

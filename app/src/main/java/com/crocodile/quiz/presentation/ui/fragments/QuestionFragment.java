@@ -61,7 +61,6 @@ public class QuestionFragment extends Fragment {
         buttons.add(new ButtonContainer(button4));
         imageView = act.findViewById(R.id.imageViewQuestion);
         container = act.findViewById(R.id.containerQuestion);
-        //informationButton = act.findViewById(R.id.info_button);
         informationButton = (FloatingActionButton) act.findViewById(R.id.fab);
         informationButton.hide();
 
@@ -76,17 +75,9 @@ public class QuestionFragment extends Fragment {
 
     }
 
-    /*@Override
-    public void onResume() {
-        super.onResume();
-        if ((question.isAnswered()) && (question.getInformation().hasSomethingToShow())) {
-            setupInformationButton();
-        }
-    }*/
 
     public void hideInformationButton() {
         informationButton.setVisibility(View.INVISIBLE);
-       // informationButton.hide();
     }
 
     private void setupQuestion() {
@@ -108,11 +99,10 @@ public class QuestionFragment extends Fragment {
                 public void onClick(View view) {
                     int index = buttons.indexOf(bc);
                     if (!question.isAnswered()) {
-                        question.setPlayerAnswerIndex(index);
                         colorButtons(index);
-                       setupInformationButton(); //why it here ?
+                        setupInformationButton();
 
-                        ((QuestionActivity) getActivity()).setQuestionAnswered();
+                        ((QuestionActivity) getActivity()).setQuestionAnswered(question, index);
                     } else {
                         for (ButtonContainer button : buttons) {
                             button.switchText();
@@ -154,36 +144,6 @@ public class QuestionFragment extends Fragment {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         getContext().startActivity(intent);
     }
-
-    /*@Override
-    public Animation onCreateAnimation(int transit, boolean enter, int nextAnim) {
-
-        Animation anim = AnimationUtils.loadAnimation(getActivity(), nextAnim);
-
-        anim.setAnimationListener(new Animation.AnimationListener() {
-
-            @Override
-            public void onAnimationStart(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                if (question.isAnswered()) {
-                    setupInformationButton();
-                    Log.d("qqqqq",""+question.isAnswered()+question.getAnswers().get(0).getText());
-
-                }
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-
-        return anim;
-    }*/
 
     private class ButtonContainer {
         private Button button;
